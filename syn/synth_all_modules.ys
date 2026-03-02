@@ -1,0 +1,48 @@
+# EtherCAT IP Core - Full Module Synthesis
+# Synthesize all modules to get accurate resource counts
+# =====================================================================
+
+# Read all RTL module files (not .vh headers - those are included)
+read_verilog -sv -I../rtl ../rtl/ddr_stages.v
+read_verilog -sv -I../rtl ../rtl/synchronizer.v
+read_verilog -sv -I../rtl ../rtl/async_fifo.v
+read_verilog -sv -I../rtl ../rtl/ecat_phy_interface.v
+read_verilog -sv -I../rtl ../rtl/ecat_dpram.sv
+read_verilog -sv -I../rtl ../rtl/ecat_fmmu.sv
+read_verilog -sv -I../rtl ../rtl/ecat_sync_manager.sv
+read_verilog -sv -I../rtl ../rtl/ecat_frame_receiver.sv
+read_verilog -sv -I../rtl ../rtl/ecat_frame_transmitter.sv
+read_verilog -sv -I../rtl ../rtl/ecat_register_map.sv
+read_verilog -sv -I../rtl ../rtl/ecat_dc.sv
+read_verilog -sv -I../rtl ../rtl/ecat_al_statemachine.sv
+read_verilog -sv -I../rtl ../rtl/ecat_pdi_avalon.sv
+read_verilog -sv -I../rtl ../rtl/ecat_core_main.sv
+
+# Elaborate WITHOUT specifying a top - keeps all modules
+hierarchy -check
+
+# Process all modules
+proc
+opt
+
+# FSM optimization
+fsm
+opt
+
+# Memory inference
+memory
+opt
+
+# Technology mapping
+techmap
+opt
+
+# Gate-level optimization
+abc -g cmos
+opt_clean
+
+# Full statistics for ALL modules
+stat
+
+# Save detailed report
+tee -q -o reports/all_modules_stat.txt stat

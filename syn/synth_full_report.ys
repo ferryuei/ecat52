@@ -1,0 +1,57 @@
+# EtherCAT IP Core - Full Synthesis with Reports
+# ================================================
+
+# Read all RTL files
+read_verilog -sv -I../rtl ../rtl/ddr_stages.v
+read_verilog -sv -I../rtl ../rtl/synchronizer.v
+read_verilog -sv -I../rtl ../rtl/async_fifo.v
+read_verilog -sv -I../rtl ../rtl/ecat_phy_interface.v
+read_verilog -sv -I../rtl ../rtl/ecat_dpram.sv
+read_verilog -sv -I../rtl ../rtl/ecat_fmmu.sv
+read_verilog -sv -I../rtl ../rtl/ecat_sync_manager.sv
+read_verilog -sv -I../rtl ../rtl/ecat_frame_receiver.sv
+read_verilog -sv -I../rtl ../rtl/ecat_frame_transmitter.sv
+read_verilog -sv -I../rtl ../rtl/ecat_register_map.sv
+read_verilog -sv -I../rtl ../rtl/ecat_dc.sv
+read_verilog -sv -I../rtl ../rtl/ecat_al_statemachine.sv
+read_verilog -sv -I../rtl ../rtl/ecat_pdi_avalon.sv
+read_verilog -sv -I../rtl ../rtl/ecat_core_main.sv
+
+# Hierarchy check
+hierarchy -check
+
+# High-level synthesis
+proc
+opt
+fsm
+opt
+
+# Memory handling
+memory -nomap
+opt
+
+# Flatten for better optimization
+flatten
+opt -full
+
+# Technology mapping to gates
+techmap
+opt
+
+# Map to standard cells (CMOS gates)
+abc -g cmos4
+opt_clean
+
+# Generate reports
+tee -q -o reports/hierarchy.txt hierarchy -top ecat_core_main
+tee -q -o reports/cells_stat.txt stat
+tee -q -o reports/gate_count.txt stat -tech cmos4
+
+# Timing analysis
+tee -q -o reports/timing.txt ltp
+
+# Show all module statistics
+stat
+
+# Write gate-level netlist
+write_verilog -noattr reports/netlist_gates.v

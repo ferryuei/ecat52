@@ -1,0 +1,46 @@
+# EtherCAT IP Core - Full Synthesis with Reports
+
+# Read all RTL files
+read_verilog -sv ../rtl/ecat_pkg.sv
+read_verilog -sv ../rtl/ecat_dpram.sv
+read_verilog -sv ../rtl/ecat_fmmu.sv
+read_verilog -sv ../rtl/ecat_sync_manager.sv
+read_verilog -sv ../rtl/ecat_frame_receiver.sv
+read_verilog -sv ../rtl/ecat_frame_transmitter.sv
+read_verilog -sv ../rtl/ecat_register_map.sv
+read_verilog -sv ../rtl/ecat_dc.sv
+read_verilog -sv ../rtl/ecat_al_statemachine.sv
+read_verilog -sv ../rtl/ecat_pdi_avalon.sv
+read_verilog -sv ../rtl/ecat_core_main.sv
+read_verilog ../rtl/ecat_phy_interface.v
+
+# Set top module to core_main (actual complete design)
+hierarchy -check -top ecat_core_main
+
+# High-level synthesis
+proc
+opt
+fsm
+opt
+
+# Memory handling
+memory -nomap
+opt
+
+# Flatten hierarchy
+flatten
+opt -full
+
+# Technology mapping to CMOS gates
+techmap
+opt
+
+# ABC synthesis for gate-level
+abc -g cmos4
+
+# Clean up
+opt_clean -purge
+
+# Generate reports
+tee -o reports/final_stat.txt stat
+tee -o reports/final_timing.txt ltp

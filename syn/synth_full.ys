@@ -1,0 +1,46 @@
+# EtherCAT IP Core - Full Synthesis with Reports
+
+# Read all RTL files with absolute paths
+read_verilog -sv /mnt/d/ECAT/rtl/ecat_pkg.sv
+read_verilog -sv /mnt/d/ECAT/rtl/ecat_dpram.sv
+read_verilog -sv /mnt/d/ECAT/rtl/ecat_fmmu.sv
+read_verilog -sv /mnt/d/ECAT/rtl/ecat_sync_manager.sv
+read_verilog -sv /mnt/d/ECAT/rtl/ecat_frame_receiver.sv
+read_verilog -sv /mnt/d/ECAT/rtl/ecat_frame_transmitter.sv
+read_verilog -sv /mnt/d/ECAT/rtl/ecat_register_map.sv
+read_verilog -sv /mnt/d/ECAT/rtl/ecat_dc.sv
+read_verilog -sv /mnt/d/ECAT/rtl/ecat_al_statemachine.sv
+read_verilog -sv /mnt/d/ECAT/rtl/ecat_pdi_avalon.sv
+read_verilog -sv /mnt/d/ECAT/rtl/ecat_core_main.sv
+read_verilog /mnt/d/ECAT/rtl/ecat_phy_interface.v
+
+# Set top module
+hierarchy -check -top ecat_core_main
+
+# High-level synthesis
+proc
+opt
+fsm
+opt
+
+# Memory handling
+memory -nomap
+opt
+
+# Flatten hierarchy
+flatten
+opt -full
+
+# Technology mapping
+techmap
+opt
+
+# ABC synthesis for gate-level
+abc -g cmos4
+
+# Clean up
+opt_clean -purge
+
+# Generate reports
+tee -o /mnt/d/ECAT/syn/reports/stat_report.txt stat
+tee -o /mnt/d/ECAT/syn/reports/timing_report.txt ltp

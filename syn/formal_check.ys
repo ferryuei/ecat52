@@ -1,0 +1,44 @@
+# EtherCAT IP Core - Formal Verification Script
+# Uses Yosys built-in formal verification
+
+# Read all RTL modules
+read_verilog -sv -I../rtl ../rtl/ddr_stages.v
+read_verilog -sv -I../rtl ../rtl/synchronizer.v
+read_verilog -sv -I../rtl ../rtl/async_fifo.v
+read_verilog -sv -I../rtl ../rtl/ecat_phy_interface.v
+read_verilog -sv -I../rtl ../rtl/ecat_dpram.sv
+read_verilog -sv -I../rtl ../rtl/ecat_fmmu.sv
+read_verilog -sv -I../rtl ../rtl/ecat_sync_manager.sv
+read_verilog -sv -I../rtl ../rtl/ecat_frame_receiver.sv
+read_verilog -sv -I../rtl ../rtl/ecat_frame_transmitter.sv
+read_verilog -sv -I../rtl ../rtl/ecat_register_map.sv
+read_verilog -sv -I../rtl ../rtl/ecat_dc.sv
+read_verilog -sv -I../rtl ../rtl/ecat_al_statemachine.sv
+read_verilog -sv -I../rtl ../rtl/ecat_pdi_avalon.sv
+read_verilog -sv -I../rtl ../rtl/ecat_core_main.sv
+read_verilog -sv -I../rtl ../rtl/ecat_sii_controller.sv
+read_verilog -sv -I../rtl ../rtl/ecat_mailbox_handler.sv
+read_verilog -sv -I../rtl ../rtl/ecat_port_controller.sv
+read_verilog -sv -I../rtl ../rtl/ecat_coe_handler.sv
+read_verilog -sv -I../rtl ../rtl/ecat_mdio_master.sv
+read_verilog -sv -I../rtl ../rtl/ethercat_ipcore_top.v
+
+# Hierarchy check
+hierarchy -check -top ethercat_ipcore_top
+
+# Prepare for formal
+proc
+opt
+
+# Formal preparation
+async2sync
+formalff
+
+# Check for issues
+check -assert
+
+# Write SMT2 file for external solver
+write_smt2 -wires reports/formal.smt2
+
+# Print check summary
+tee -o reports/formal_check.txt check

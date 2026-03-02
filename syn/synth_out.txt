@@ -1,0 +1,618 @@
+
+ /----------------------------------------------------------------------------\
+ |  yosys -- Yosys Open SYnthesis Suite                                       |
+ |  Copyright (C) 2012 - 2026  Claire Xenia Wolf <claire@yosyshq.com>         |
+ |  Distributed under an ISC-like license, type "license" to see terms        |
+ \----------------------------------------------------------------------------/
+ Yosys 0.61+112 (git sha1 ac427a79b, g++ 11.4.0-1ubuntu1~22.04.2 -fPIC -O3)
+
+-- Executing script file `synth.ys' --
+
+1. Executing Verilog-2005 frontend: ../rtl/ddr_stages.v
+Parsing SystemVerilog input from `../rtl/ddr_stages.v' to AST representation.
+Generating RTLIL representation for module `\ddr_input_stage'.
+Generating RTLIL representation for module `\ddr_output_stage'.
+Successfully finished Verilog frontend.
+
+2. Executing Verilog-2005 frontend: ../rtl/synchronizer.v
+Parsing SystemVerilog input from `../rtl/synchronizer.v' to AST representation.
+Generating RTLIL representation for module `\synchronizer'.
+Successfully finished Verilog frontend.
+
+3. Executing Verilog-2005 frontend: ../rtl/async_fifo.v
+Parsing SystemVerilog input from `../rtl/async_fifo.v' to AST representation.
+Generating RTLIL representation for module `\async_fifo'.
+Warning: Replacing memory \wr_ptr_gray_sync with list of registers. See ../rtl/async_fifo.v:137
+Warning: Replacing memory \rd_ptr_gray_sync with list of registers. See ../rtl/async_fifo.v:97
+Successfully finished Verilog frontend.
+
+4. Executing Verilog-2005 frontend: ../rtl/ecat_phy_interface.v
+Parsing SystemVerilog input from `../rtl/ecat_phy_interface.v' to AST representation.
+../rtl/ecat_phy_interface.v:116: Warning: Yosys has only limited support for tri-state logic at the moment.
+Generating RTLIL representation for module `\ecat_phy_interface'.
+Successfully finished Verilog frontend.
+
+5. Executing Verilog-2005 frontend: ../rtl/ecat_dpram.sv
+Parsing SystemVerilog input from `../rtl/ecat_dpram.sv' to AST representation.
+Generating RTLIL representation for module `\ecat_dpram'.
+Warning: Replacing memory \memory with list of registers. See ../rtl/ecat_dpram.sv:100
+Successfully finished Verilog frontend.
+
+6. Executing Verilog-2005 frontend: ../rtl/ecat_fmmu.sv
+Parsing SystemVerilog input from `../rtl/ecat_fmmu.sv' to AST representation.
+Generating RTLIL representation for module `\ecat_fmmu'.
+Generating RTLIL representation for module `\ecat_fmmu_array'.
+Warning: wire '\phy_addr' is assigned in a block at ../rtl/ecat_fmmu.sv:411.13-411.50.
+Warning: wire '\phy_wr' is assigned in a block at ../rtl/ecat_fmmu.sv:412.13-412.46.
+Warning: wire '\phy_wdata' is assigned in a block at ../rtl/ecat_fmmu.sv:413.13-413.52.
+Warning: wire '\phy_addr' is assigned in a block at ../rtl/ecat_fmmu.sv:416.13-416.26.
+Warning: wire '\phy_wr' is assigned in a block at ../rtl/ecat_fmmu.sv:417.13-417.26.
+Warning: wire '\phy_wdata' is assigned in a block at ../rtl/ecat_fmmu.sv:418.13-418.27.
+Successfully finished Verilog frontend.
+
+7. Executing Verilog-2005 frontend: ../rtl/ecat_sync_manager.sv
+Parsing SystemVerilog input from `../rtl/ecat_sync_manager.sv' to AST representation.
+Generating RTLIL representation for module `\ecat_sync_manager'.
+Generating RTLIL representation for module `\ecat_sync_manager_array'.
+Warning: wire '\mem_wr' is assigned in a block at ../rtl/ecat_sync_manager.sv:647.13-647.46.
+Warning: wire '\mem_addr' is assigned in a block at ../rtl/ecat_sync_manager.sv:648.13-648.50.
+Warning: wire '\mem_wdata' is assigned in a block at ../rtl/ecat_sync_manager.sv:649.13-649.52.
+Warning: wire '\mem_wr' is assigned in a block at ../rtl/ecat_sync_manager.sv:651.13-651.26.
+Warning: wire '\mem_addr' is assigned in a block at ../rtl/ecat_sync_manager.sv:652.13-652.26.
+Warning: wire '\mem_wdata' is assigned in a block at ../rtl/ecat_sync_manager.sv:653.13-653.27.
+Successfully finished Verilog frontend.
+
+8. Executing Verilog-2005 frontend: ../rtl/ecat_frame_receiver.sv
+Parsing SystemVerilog input from `../rtl/ecat_frame_receiver.sv' to AST representation.
+Generating RTLIL representation for module `\ecat_frame_receiver'.
+Warning: Replacing memory \wr_data with list of registers. See ../rtl/ecat_frame_receiver.sv:369
+Warning: Replacing memory \wr_addr with list of registers. See ../rtl/ecat_frame_receiver.sv:368
+Successfully finished Verilog frontend.
+
+9. Executing Verilog-2005 frontend: ../rtl/ecat_frame_transmitter.sv
+Parsing SystemVerilog input from `../rtl/ecat_frame_transmitter.sv' to AST representation.
+Generating RTLIL representation for module `\ecat_frame_transmitter'.
+Warning: Replacing memory \frame_buffer with list of registers. See ../rtl/ecat_frame_transmitter.sv:143
+../rtl/ecat_frame_transmitter.sv:232: Warning: Range [3:0] select out of bounds on signal `\current_port_idx': Setting 1 MSB bits to undef.
+Successfully finished Verilog frontend.
+
+10. Executing Verilog-2005 frontend: ../rtl/ecat_register_map.sv
+Parsing SystemVerilog input from `../rtl/ecat_register_map.sv' to AST representation.
+Generating RTLIL representation for module `\ecat_register_map'.
+Successfully finished Verilog frontend.
+
+11. Executing Verilog-2005 frontend: ../rtl/ecat_dc.sv
+Parsing SystemVerilog input from `../rtl/ecat_dc.sv' to AST representation.
+Generating RTLIL representation for module `\ecat_dc'.
+Warning: Replacing memory \port_recv_time with list of registers. See ../rtl/ecat_dc.sv:205
+Successfully finished Verilog frontend.
+
+12. Executing Verilog-2005 frontend: ../rtl/ecat_al_statemachine.sv
+Parsing SystemVerilog input from `../rtl/ecat_al_statemachine.sv' to AST representation.
+Generating RTLIL representation for module `\ecat_al_statemachine'.
+Successfully finished Verilog frontend.
+
+13. Executing Verilog-2005 frontend: ../rtl/ecat_pdi_avalon.sv
+Parsing SystemVerilog input from `../rtl/ecat_pdi_avalon.sv' to AST representation.
+Generating RTLIL representation for module `\ecat_pdi_avalon'.
+Successfully finished Verilog frontend.
+
+14. Executing Verilog-2005 frontend: ../rtl/ecat_core_main.sv
+Parsing SystemVerilog input from `../rtl/ecat_core_main.sv' to AST representation.
+Generating RTLIL representation for module `\ecat_core_main'.
+Warning: wire '\SCL2049' is assigned in a block at ../rtl/ecat_core_main.sv:457.13-457.28.
+Warning: wire '\SCL2049' is assigned in a block at ../rtl/ecat_core_main.sv:463.17-463.32.
+Warning: wire '\TCL2044' is assigned in a block at ../rtl/ecat_core_main.sv:469.13-469.28.
+Warning: wire '\TCL2044' is assigned in a block at ../rtl/ecat_core_main.sv:475.17-475.32.
+Warning: Replacing memory \GPD3560 with list of registers. See ../rtl/ecat_core_main.sv:390
+../rtl/ecat_core_main.sv:449: Warning: Identifier `\FS_3577' is implicitly declared.
+Successfully finished Verilog frontend.
+
+15. Executing Verilog-2005 frontend: ../rtl/ethercat_ipcore_top.v
+Parsing SystemVerilog input from `../rtl/ethercat_ipcore_top.v' to AST representation.
+../rtl/ethercat_ipcore_top.v:157: Warning: Yosys has only limited support for tri-state logic at the moment.
+../rtl/ethercat_ipcore_top.v:215: Warning: Yosys has only limited support for tri-state logic at the moment.
+Generating RTLIL representation for module `\ethercat_ipcore_top'.
+Successfully finished Verilog frontend.
+
+16. Executing HIERARCHY pass (managing design hierarchy).
+
+16.1. Analyzing design hierarchy..
+Top module:  \ethercat_ipcore_top
+Used module:     \ecat_phy_interface
+Parameter \PHY_COUNT = 2
+Parameter \PHY_TYPE = 24'010011010100100101001001
+Parameter \USE_DDR = 1
+
+16.2. Executing AST frontend in derive mode using pre-parsed AST for module `\ecat_phy_interface'.
+Parameter \PHY_COUNT = 2
+Parameter \PHY_TYPE = 24'010011010100100101001001
+Parameter \USE_DDR = 1
+Generating RTLIL representation for module `$paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface'.
+
+16.3. Analyzing design hierarchy..
+Top module:  \ethercat_ipcore_top
+Used module:     $paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface
+
+16.4. Analyzing design hierarchy..
+Top module:  \ethercat_ipcore_top
+Used module:     $paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface
+Removing unused module `\ecat_core_main'.
+Removing unused module `\ecat_pdi_avalon'.
+Removing unused module `\ecat_al_statemachine'.
+Removing unused module `\ecat_dc'.
+Removing unused module `\ecat_register_map'.
+Removing unused module `\ecat_frame_transmitter'.
+Removing unused module `\ecat_frame_receiver'.
+Removing unused module `\ecat_sync_manager_array'.
+Removing unused module `\ecat_sync_manager'.
+Removing unused module `\ecat_fmmu_array'.
+Removing unused module `\ecat_fmmu'.
+Removing unused module `\ecat_dpram'.
+Removing unused module `\ecat_phy_interface'.
+Removing unused module `\async_fifo'.
+Removing unused module `\synchronizer'.
+Removing unused module `\ddr_output_stage'.
+Removing unused module `\ddr_input_stage'.
+Removed 17 unused modules.
+
+17. Executing PROC pass (convert processes to netlists).
+
+17.1. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Cleaned up 0 empty switches.
+
+17.2. Executing PROC_RMDEAD pass (remove dead branches from decision trees).
+Marked 1 switch rules as full_case in process $proc$../rtl/ethercat_ipcore_top.v:218$1385 in module ethercat_ipcore_top.
+Marked 1 switch rules as full_case in process $proc$../rtl/ethercat_ipcore_top.v:148$1381 in module ethercat_ipcore_top.
+Marked 1 switch rules as full_case in process $proc$../rtl/ethercat_ipcore_top.v:140$1379 in module ethercat_ipcore_top.
+Marked 1 switch rules as full_case in process $proc$../rtl/ecat_phy_interface.v:166$1397 in module $paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface.
+Marked 2 switch rules as full_case in process $proc$../rtl/ecat_phy_interface.v:118$1392 in module $paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface.
+Marked 2 switch rules as full_case in process $proc$../rtl/ecat_phy_interface.v:95$1387 in module $paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface.
+Removed a total of 0 dead cases.
+
+17.3. Executing PROC_PRUNE pass (remove redundant assignments in processes).
+Removed 3 redundant assignments.
+Promoted 0 assignments to connections.
+
+17.4. Executing PROC_INIT pass (extract init attributes).
+
+17.5. Executing PROC_ARST pass (detect async resets in processes).
+Found async reset \sys_rst_n_sync in `\ethercat_ipcore_top.$proc$../rtl/ethercat_ipcore_top.v:218$1385'.
+Found async reset \sys_rst_n in `\ethercat_ipcore_top.$proc$../rtl/ethercat_ipcore_top.v:148$1381'.
+Found async reset \sys_rst_n in `\ethercat_ipcore_top.$proc$../rtl/ethercat_ipcore_top.v:140$1379'.
+Found async reset \rst_n in `$paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface.$proc$../rtl/ecat_phy_interface.v:166$1397'.
+Found async reset \rst_n in `$paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface.$proc$../rtl/ecat_phy_interface.v:118$1392'.
+Found async reset \rst_n in `$paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface.$proc$../rtl/ecat_phy_interface.v:95$1387'.
+
+17.6. Executing PROC_ROM pass (convert switches to ROMs).
+Converted 0 switches.
+<suppressed ~5 debug messages>
+
+17.7. Executing PROC_MUX pass (convert decision trees to multiplexers).
+Creating decoders for process `\ethercat_ipcore_top.$proc$../rtl/ethercat_ipcore_top.v:218$1385'.
+     1/5: $0\status_reg[15:0] [15:2]
+     2/5: $0\irq_status[31:0]
+     3/5: $0\status_reg[15:0] [1:0]
+     4/5: $0\control_reg[15:0]
+     5/5: $0\irq_mask[31:0]
+Creating decoders for process `\ethercat_ipcore_top.$proc$../rtl/ethercat_ipcore_top.v:148$1381'.
+     1/1: $0\ecat_rst_sync[2:0]
+Creating decoders for process `\ethercat_ipcore_top.$proc$../rtl/ethercat_ipcore_top.v:140$1379'.
+     1/1: $0\sys_rst_sync[2:0]
+Creating decoders for process `$paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface.$proc$../rtl/ecat_phy_interface.v:166$1397'.
+     1/3: $0\duplex_status[1:0]
+     2/3: $0\speed_status[1:0]
+     3/3: $0\link_status[1:0]
+Creating decoders for process `$paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface.$proc$../rtl/ecat_phy_interface.v:118$1392'.
+     1/7: $0\mdio_output_enable[0:0]
+     2/7: $0\mdio_out[0:0]
+     3/7: $0\mdio_bit_cnt[5:0]
+     4/7: $0\mdio_state[2:0]
+     5/7: $0\mdio_busy[0:0]
+     6/7: $0\mdio_read_valid[0:0]
+     7/7: $0\mdio_mdc[0:0]
+Creating decoders for process `$paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface.$proc$../rtl/ecat_phy_interface.v:95$1387'.
+     1/2: $0\phy_reset_n[1:0]
+     2/2: $0\reset_counter[15:0]
+
+17.8. Executing PROC_DLATCH pass (convert process syncs to latches).
+
+17.9. Executing PROC_DFF pass (convert process syncs to FFs).
+Creating register for signal `\ethercat_ipcore_top.\irq_mask' using process `\ethercat_ipcore_top.$proc$../rtl/ethercat_ipcore_top.v:218$1385'.
+  created $adff cell `$procdff$1442' with positive edge clock and positive level reset.
+Creating register for signal `\ethercat_ipcore_top.\control_reg' using process `\ethercat_ipcore_top.$proc$../rtl/ethercat_ipcore_top.v:218$1385'.
+  created $adff cell `$procdff$1447' with positive edge clock and positive level reset.
+Creating register for signal `\ethercat_ipcore_top.\status_reg' using process `\ethercat_ipcore_top.$proc$../rtl/ethercat_ipcore_top.v:218$1385'.
+  created $adff cell `$procdff$1452' with positive edge clock and positive level reset.
+Creating register for signal `\ethercat_ipcore_top.\irq_status' using process `\ethercat_ipcore_top.$proc$../rtl/ethercat_ipcore_top.v:218$1385'.
+  created $adff cell `$procdff$1457' with positive edge clock and positive level reset.
+Creating register for signal `\ethercat_ipcore_top.\ecat_rst_sync' using process `\ethercat_ipcore_top.$proc$../rtl/ethercat_ipcore_top.v:148$1381'.
+  created $adff cell `$procdff$1462' with positive edge clock and positive level reset.
+Creating register for signal `\ethercat_ipcore_top.\sys_rst_sync' using process `\ethercat_ipcore_top.$proc$../rtl/ethercat_ipcore_top.v:140$1379'.
+  created $adff cell `$procdff$1467' with positive edge clock and positive level reset.
+Creating register for signal `$paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface.\link_status' using process `$paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface.$proc$../rtl/ecat_phy_interface.v:166$1397'.
+  created $adff cell `$procdff$1472' with positive edge clock and positive level reset.
+Creating register for signal `$paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface.\speed_status' using process `$paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface.$proc$../rtl/ecat_phy_interface.v:166$1397'.
+  created $adff cell `$procdff$1477' with positive edge clock and positive level reset.
+Creating register for signal `$paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface.\duplex_status' using process `$paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface.$proc$../rtl/ecat_phy_interface.v:166$1397'.
+  created $adff cell `$procdff$1482' with positive edge clock and positive level reset.
+Creating register for signal `$paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface.\mdio_mdc' using process `$paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface.$proc$../rtl/ecat_phy_interface.v:118$1392'.
+  created $adff cell `$procdff$1487' with positive edge clock and positive level reset.
+Creating register for signal `$paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface.\mdio_read_valid' using process `$paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface.$proc$../rtl/ecat_phy_interface.v:118$1392'.
+  created $adff cell `$procdff$1492' with positive edge clock and positive level reset.
+Creating register for signal `$paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface.\mdio_busy' using process `$paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface.$proc$../rtl/ecat_phy_interface.v:118$1392'.
+  created $adff cell `$procdff$1497' with positive edge clock and positive level reset.
+Creating register for signal `$paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface.\mdio_state' using process `$paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface.$proc$../rtl/ecat_phy_interface.v:118$1392'.
+  created $adff cell `$procdff$1502' with positive edge clock and positive level reset.
+Creating register for signal `$paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface.\mdio_bit_cnt' using process `$paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface.$proc$../rtl/ecat_phy_interface.v:118$1392'.
+  created $adff cell `$procdff$1507' with positive edge clock and positive level reset.
+Creating register for signal `$paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface.\mdio_out' using process `$paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface.$proc$../rtl/ecat_phy_interface.v:118$1392'.
+  created $adff cell `$procdff$1512' with positive edge clock and positive level reset.
+Creating register for signal `$paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface.\mdio_output_enable' using process `$paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface.$proc$../rtl/ecat_phy_interface.v:118$1392'.
+  created $adff cell `$procdff$1517' with positive edge clock and positive level reset.
+Creating register for signal `$paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface.\phy_reset_n' using process `$paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface.$proc$../rtl/ecat_phy_interface.v:95$1387'.
+  created $adff cell `$procdff$1522' with positive edge clock and positive level reset.
+Creating register for signal `$paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface.\reset_counter' using process `$paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface.$proc$../rtl/ecat_phy_interface.v:95$1387'.
+  created $adff cell `$procdff$1527' with positive edge clock and positive level reset.
+
+17.10. Executing PROC_MEMWR pass (convert process memory writes to cells).
+
+17.11. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Removing empty process `ethercat_ipcore_top.$proc$../rtl/ethercat_ipcore_top.v:218$1385'.
+Removing empty process `ethercat_ipcore_top.$proc$../rtl/ethercat_ipcore_top.v:148$1381'.
+Removing empty process `ethercat_ipcore_top.$proc$../rtl/ethercat_ipcore_top.v:140$1379'.
+Found and cleaned up 1 empty switch in `$paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface.$proc$../rtl/ecat_phy_interface.v:166$1397'.
+Removing empty process `$paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface.$proc$../rtl/ecat_phy_interface.v:166$1397'.
+Found and cleaned up 3 empty switches in `$paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface.$proc$../rtl/ecat_phy_interface.v:118$1392'.
+Removing empty process `$paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface.$proc$../rtl/ecat_phy_interface.v:118$1392'.
+Found and cleaned up 1 empty switch in `$paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface.$proc$../rtl/ecat_phy_interface.v:95$1387'.
+Removing empty process `$paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface.$proc$../rtl/ecat_phy_interface.v:95$1387'.
+Cleaned up 5 empty switches.
+
+17.12. Executing OPT_EXPR pass (perform const folding).
+Optimizing module ethercat_ipcore_top.
+<suppressed ~12 debug messages>
+Optimizing module $paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface.
+<suppressed ~29 debug messages>
+
+18. Executing OPT pass (performing simple optimizations).
+
+18.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module ethercat_ipcore_top.
+Optimizing module $paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface.
+
+18.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\ethercat_ipcore_top'.
+Computing hashes of 18 cells of `\ethercat_ipcore_top'.
+Finding duplicate cells in `\ethercat_ipcore_top'.
+Computing hashes of 13 cells of `\ethercat_ipcore_top'.
+Finding duplicate cells in `\ethercat_ipcore_top'.
+<suppressed ~15 debug messages>
+Finding identical cells in module `$paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface'.
+Computing hashes of 56 cells of `$paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface'.
+Finding duplicate cells in `$paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface'.
+Computing hashes of 36 cells of `$paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface'.
+Finding duplicate cells in `$paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface'.
+<suppressed ~60 debug messages>
+Removed a total of 25 cells.
+
+18.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \ethercat_ipcore_top..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module $paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~26 debug messages>
+
+18.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \ethercat_ipcore_top.
+  Optimizing cells in module $paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface.
+Performed a total of 0 changes.
+
+18.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\ethercat_ipcore_top'.
+Computing hashes of 13 cells of `\ethercat_ipcore_top'.
+Finding duplicate cells in `\ethercat_ipcore_top'.
+Finding identical cells in module `$paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface'.
+Computing hashes of 36 cells of `$paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface'.
+Finding duplicate cells in `$paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface'.
+Removed a total of 0 cells.
+
+18.6. Executing OPT_DFF pass (perform DFF optimizations).
+Adding EN signal on $procdff$1452 ($adff) from module ethercat_ipcore_top (D = \status_reg [1:0], Q = \status_reg [1:0]).
+Handling D = Q on $auto$ff.cc:337:slice$1528 ($adffe) from module ethercat_ipcore_top (removing D path).
+Handling D = Q on $procdff$1442 ($adff) from module ethercat_ipcore_top (removing D path).
+Handling D = Q on $procdff$1447 ($adff) from module ethercat_ipcore_top (removing D path).
+Handling D = Q on $procdff$1457 ($adff) from module ethercat_ipcore_top (removing D path).
+Setting constant 0-bit at position 0 on $procdff$1457 ($dlatch) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 1 on $procdff$1457 ($dlatch) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 2 on $procdff$1457 ($dlatch) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 3 on $procdff$1457 ($dlatch) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 4 on $procdff$1457 ($dlatch) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 5 on $procdff$1457 ($dlatch) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 6 on $procdff$1457 ($dlatch) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 7 on $procdff$1457 ($dlatch) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 8 on $procdff$1457 ($dlatch) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 9 on $procdff$1457 ($dlatch) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 10 on $procdff$1457 ($dlatch) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 11 on $procdff$1457 ($dlatch) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 12 on $procdff$1457 ($dlatch) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 13 on $procdff$1457 ($dlatch) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 14 on $procdff$1457 ($dlatch) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 15 on $procdff$1457 ($dlatch) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 16 on $procdff$1457 ($dlatch) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 17 on $procdff$1457 ($dlatch) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 18 on $procdff$1457 ($dlatch) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 19 on $procdff$1457 ($dlatch) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 20 on $procdff$1457 ($dlatch) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 21 on $procdff$1457 ($dlatch) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 22 on $procdff$1457 ($dlatch) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 23 on $procdff$1457 ($dlatch) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 24 on $procdff$1457 ($dlatch) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 25 on $procdff$1457 ($dlatch) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 26 on $procdff$1457 ($dlatch) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 27 on $procdff$1457 ($dlatch) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 28 on $procdff$1457 ($dlatch) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 29 on $procdff$1457 ($dlatch) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 30 on $procdff$1457 ($dlatch) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 31 on $procdff$1457 ($dlatch) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 0 on $procdff$1447 ($dlatch) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 1 on $procdff$1447 ($dlatch) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 2 on $procdff$1447 ($dlatch) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 3 on $procdff$1447 ($dlatch) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 4 on $procdff$1447 ($dlatch) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 5 on $procdff$1447 ($dlatch) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 6 on $procdff$1447 ($dlatch) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 7 on $procdff$1447 ($dlatch) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 8 on $procdff$1447 ($dlatch) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 9 on $procdff$1447 ($dlatch) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 10 on $procdff$1447 ($dlatch) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 11 on $procdff$1447 ($dlatch) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 12 on $procdff$1447 ($dlatch) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 13 on $procdff$1447 ($dlatch) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 14 on $procdff$1447 ($dlatch) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 15 on $procdff$1447 ($dlatch) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 0 on $procdff$1442 ($dlatch) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 1 on $procdff$1442 ($dlatch) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 2 on $procdff$1442 ($dlatch) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 3 on $procdff$1442 ($dlatch) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 4 on $procdff$1442 ($dlatch) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 5 on $procdff$1442 ($dlatch) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 6 on $procdff$1442 ($dlatch) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 7 on $procdff$1442 ($dlatch) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 8 on $procdff$1442 ($dlatch) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 9 on $procdff$1442 ($dlatch) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 10 on $procdff$1442 ($dlatch) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 11 on $procdff$1442 ($dlatch) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 12 on $procdff$1442 ($dlatch) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 13 on $procdff$1442 ($dlatch) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 14 on $procdff$1442 ($dlatch) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 15 on $procdff$1442 ($dlatch) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 16 on $procdff$1442 ($dlatch) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 17 on $procdff$1442 ($dlatch) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 18 on $procdff$1442 ($dlatch) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 19 on $procdff$1442 ($dlatch) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 20 on $procdff$1442 ($dlatch) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 21 on $procdff$1442 ($dlatch) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 22 on $procdff$1442 ($dlatch) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 23 on $procdff$1442 ($dlatch) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 24 on $procdff$1442 ($dlatch) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 25 on $procdff$1442 ($dlatch) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 26 on $procdff$1442 ($dlatch) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 27 on $procdff$1442 ($dlatch) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 28 on $procdff$1442 ($dlatch) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 29 on $procdff$1442 ($dlatch) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 30 on $procdff$1442 ($dlatch) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 31 on $procdff$1442 ($dlatch) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 0 on $auto$ff.cc:337:slice$1528 ($dlatch) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 1 on $auto$ff.cc:337:slice$1528 ($dlatch) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 0 on $auto$ff.cc:337:slice$1531 ($adff) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 1 on $auto$ff.cc:337:slice$1531 ($adff) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 2 on $auto$ff.cc:337:slice$1531 ($adff) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 3 on $auto$ff.cc:337:slice$1531 ($adff) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 4 on $auto$ff.cc:337:slice$1531 ($adff) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 5 on $auto$ff.cc:337:slice$1531 ($adff) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 6 on $auto$ff.cc:337:slice$1531 ($adff) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 7 on $auto$ff.cc:337:slice$1531 ($adff) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 8 on $auto$ff.cc:337:slice$1531 ($adff) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 9 on $auto$ff.cc:337:slice$1531 ($adff) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 10 on $auto$ff.cc:337:slice$1531 ($adff) from module ethercat_ipcore_top.
+Setting constant 0-bit at position 11 on $auto$ff.cc:337:slice$1531 ($adff) from module ethercat_ipcore_top.
+Handling D = Q on $procdff$1477 ($adff) from module $paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface (removing D path).
+Adding EN signal on $procdff$1517 ($adff) from module $paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface (D = $procmux$1403_Y, Q = \mdio_output_enable).
+Adding EN signal on $procdff$1512 ($adff) from module $paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface (D = 1'1, Q = \mdio_out).
+Handling D = Q on $procdff$1482 ($adff) from module $paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface (removing D path).
+Adding EN signal on $procdff$1497 ($adff) from module $paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface (D = 1'0, Q = \mdio_busy).
+Adding EN signal on $procdff$1527 ($adff) from module $paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface (D = $sub$../rtl/ecat_phy_interface.v:101$1390_Y, Q = \reset_counter).
+Adding EN signal on $procdff$1487 ($adff) from module $paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface (D = $procmux$1429_Y, Q = \mdio_mdc).
+Adding EN signal on $procdff$1507 ($adff) from module $paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface (D = $procmux$1410_Y, Q = \mdio_bit_cnt).
+Adding EN signal on $procdff$1502 ($adff) from module $paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface (D = $procmux$1421_Y, Q = \mdio_state).
+Handling D = Q on $procdff$1492 ($adff) from module $paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface (removing D path).
+Adding EN signal on $procdff$1472 ($adff) from module $paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface (D = 2'11, Q = \link_status).
+Setting constant 0-bit at position 0 on $procdff$1492 ($dlatch) from module $paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface.
+Setting constant 1-bit at position 0 on $procdff$1482 ($dlatch) from module $paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface.
+Setting constant 1-bit at position 1 on $procdff$1482 ($dlatch) from module $paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface.
+Setting constant 1-bit at position 0 on $procdff$1477 ($dlatch) from module $paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface.
+Setting constant 1-bit at position 1 on $procdff$1477 ($dlatch) from module $paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface.
+Setting constant 0-bit at position 0 on $auto$ff.cc:337:slice$1537 ($adffe) from module $paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface.
+Setting constant 1-bit at position 0 on $auto$ff.cc:337:slice$1536 ($adffe) from module $paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface.
+
+18.7. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \ethercat_ipcore_top..
+Finding unused cells or wires in module $paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface..
+Removed 15 unused cells and 90 unused wires.
+<suppressed ~23 debug messages>
+
+18.8. Executing OPT_EXPR pass (perform const folding).
+Optimizing module $paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface.
+<suppressed ~3 debug messages>
+Optimizing module ethercat_ipcore_top.
+<suppressed ~1 debug messages>
+
+18.9. Rerunning OPT passes. (Maybe there is more to do..)
+
+18.10. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module $paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \ethercat_ipcore_top..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~16 debug messages>
+
+18.11. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module $paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface.
+  Optimizing cells in module \ethercat_ipcore_top.
+Performed a total of 0 changes.
+
+18.12. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `$paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface'.
+Computing hashes of 30 cells of `$paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface'.
+Finding duplicate cells in `$paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface'.
+Computing hashes of 29 cells of `$paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface'.
+Finding duplicate cells in `$paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface'.
+<suppressed ~3 debug messages>
+Finding identical cells in module `\ethercat_ipcore_top'.
+Computing hashes of 3 cells of `\ethercat_ipcore_top'.
+Finding duplicate cells in `\ethercat_ipcore_top'.
+Removed a total of 1 cells.
+
+18.13. Executing OPT_DFF pass (perform DFF optimizations).
+
+18.14. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module $paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface..
+Finding unused cells or wires in module \ethercat_ipcore_top..
+Removed 0 unused cells and 1 unused wires.
+<suppressed ~1 debug messages>
+
+18.15. Executing OPT_EXPR pass (perform const folding).
+Optimizing module $paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface.
+Optimizing module ethercat_ipcore_top.
+
+18.16. Rerunning OPT passes. (Maybe there is more to do..)
+
+18.17. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module $paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \ethercat_ipcore_top..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~16 debug messages>
+
+18.18. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module $paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface.
+  Optimizing cells in module \ethercat_ipcore_top.
+Performed a total of 0 changes.
+
+18.19. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `$paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface'.
+Computing hashes of 29 cells of `$paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface'.
+Finding duplicate cells in `$paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface'.
+Finding identical cells in module `\ethercat_ipcore_top'.
+Computing hashes of 3 cells of `\ethercat_ipcore_top'.
+Finding duplicate cells in `\ethercat_ipcore_top'.
+Removed a total of 0 cells.
+
+18.20. Executing OPT_DFF pass (perform DFF optimizations).
+
+18.21. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module $paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface..
+Finding unused cells or wires in module \ethercat_ipcore_top..
+
+18.22. Executing OPT_EXPR pass (perform const folding).
+Optimizing module $paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface.
+Optimizing module ethercat_ipcore_top.
+
+18.23. Finished fast OPT passes. (There is nothing left to do.)
+
+19. Printing statistics.
+
+=== $paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface ===
+
+        +----------Local Count, excluding submodules.
+        | 
+       58 wires
+      446 wire bits
+       37 public wires
+      393 public wire bits
+       27 ports
+      358 port bits
+       29 cells
+        1   $add
+        1   $adff
+        6   $adffe
+        2   $eq
+        1   $logic_not
+        5   $mux
+        2   $ne
+        2   $not
+        3   $pmux
+        3   $reduce_and
+        2   $reduce_bool
+        1   $sub
+
+=== ethercat_ipcore_top ===
+
+        +----------Local Count, excluding submodules.
+        | 
+       56 wires
+      339 wire bits
+       56 public wires
+      339 public wire bits
+       36 ports
+      124 port bits
+        2 cells
+        1   $adff
+        1   $mux
+        1 submodules
+        1   $paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface
+
+=== design hierarchy ===
+
+        +----------Count including submodules.
+        | 
+       31 ethercat_ipcore_top
+       29 $paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface
+
+        +----------Count including submodules.
+        | 
+      114 wires
+      785 wire bits
+       93 public wires
+      732 public wire bits
+       63 ports
+      482 port bits
+        - memories
+        - memory bits
+        - processes
+       31 cells
+        1   $add
+        2   $adff
+        6   $adffe
+        2   $eq
+        1   $logic_not
+        6   $mux
+        2   $ne
+        2   $not
+        3   $pmux
+        3   $reduce_and
+        2   $reduce_bool
+        1   $sub
+        1 submodules
+        1   $paramod$322f322c53d427bbc649be01a58a631485e769cf\ecat_phy_interface
+
+Warnings: 27 unique messages, 29 total
+End of script. Logfile hash: c8da26a50d, CPU: user 6.36s system 0.21s, MEM: 170.52 MB peak
+Yosys 0.61+112 (git sha1 ac427a79b, g++ 11.4.0-1ubuntu1~22.04.2 -fPIC -O3)
+Time spent: 98% 30x read_verilog (6 sec), 0% 1x hierarchy (0 sec), ...

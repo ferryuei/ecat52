@@ -1,0 +1,48 @@
+
+=== UNCONNECTED SIGNALS ===
+
+=== ETG.1000 REGISTER COVERAGE ===
+[OK] Type (0x0000) - Implemented
+[MISSING] Revision (0x0001) - NOT IMPLEMENTED
+[OK] Station_Address (0x0010) - Implemented
+[MISSING] DL_Status (0x0110) - NOT IMPLEMENTED
+[OK] AL_Control (0x0120) - Implemented
+[MISSING] AL_Status (0x0130) - NOT IMPLEMENTED
+[OK] IRQ (0x0200) - Implemented
+[OK] WD (0x0300) - Implemented
+[OK] FMMU (0x0400) - Implemented
+[OK] SII (0x0500) - Implemented
+[OK] SM (0x0800) - Implemented
+[OK] DC (0x0900) - Implemented
+[MISSING] EEPROM (0x0E00) - NOT IMPLEMENTED
+[MISSING] FMMU_Error (0x0F00) - NOT IMPLEMENTED
+
+=== AL STATE MACHINE STATES ===
+[OK] AL State: INIT
+[OK] AL State: PREOP
+[OK] AL State: SAFEOP
+[OK] AL State: OP
+[MISSING] AL State: BOOTSTRAP
+
+=== CRC32 VALIDATION ===
+[OK] CRC32 polynomial found
+[OK] CRC32 magic residue found
+
+=== MAILBOX PROTOCOL SUPPORT ===
+[OK] Mailbox: AoE referenced
+[OK] Mailbox: EoE referenced
+[OK] Mailbox: CoE referenced
+[OK] Mailbox: FoE referenced
+[OK] Mailbox: SoE referenced
+
+=== COMBINATORIAL LOOP RISK ===
+../rtl/ecat_al_statemachine.sv-        case (current_state)
+../rtl/ecat_fmmu.sv-        case (state)
+../rtl/ecat_frame_transmitter.sv-        case (state)
+../rtl/ecat_pdi_avalon.sv-        case (state)
+../rtl/ecat_port_controller.sv-                        endcase
+../rtl/ecat_sync_manager.sv-        case (state)
+../rtl/ecat_sync_manager.sv-            endcase
+
+=== FORMAL ASSERTIONS ===
+Total assertions in RTL: 15

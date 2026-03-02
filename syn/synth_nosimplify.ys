@@ -1,0 +1,68 @@
+# EtherCAT IP Core - Full Synthesis (No Simplification)
+# =====================================================
+# This script synthesizes all modules WITHOUT optimization/simplification
+# to provide accurate area and gate count analysis.
+
+# Read all RTL modules
+read_verilog -sv -I../rtl ../rtl/ddr_stages.v
+read_verilog -sv -I../rtl ../rtl/synchronizer.v
+read_verilog -sv -I../rtl ../rtl/async_fifo.v
+read_verilog -sv -I../rtl ../rtl/ecat_phy_interface.v
+read_verilog -sv -I../rtl ../rtl/ecat_dpram.sv
+read_verilog -sv -I../rtl ../rtl/ecat_fmmu.sv
+read_verilog -sv -I../rtl ../rtl/ecat_sync_manager.sv
+read_verilog -sv -I../rtl ../rtl/ecat_frame_receiver.sv
+read_verilog -sv -I../rtl ../rtl/ecat_frame_transmitter.sv
+read_verilog -sv -I../rtl ../rtl/ecat_register_map.sv
+read_verilog -sv -I../rtl ../rtl/ecat_dc.sv
+read_verilog -sv -I../rtl ../rtl/ecat_al_statemachine.sv
+read_verilog -sv -I../rtl ../rtl/ecat_pdi_avalon.sv
+read_verilog -sv -I../rtl ../rtl/ecat_core_main.sv
+
+# P0-P2 New Modules
+read_verilog -sv -I../rtl ../rtl/ecat_sii_controller.sv
+read_verilog -sv -I../rtl ../rtl/ecat_mailbox_handler.sv
+read_verilog -sv -I../rtl ../rtl/ecat_port_controller.sv
+read_verilog -sv -I../rtl ../rtl/ecat_coe_handler.sv
+read_verilog -sv -I../rtl ../rtl/ecat_mdio_master.sv
+
+# Top module
+read_verilog -sv -I../rtl ../rtl/ethercat_ipcore_top.v
+
+# Set top module and check hierarchy
+hierarchy -check -top ethercat_ipcore_top
+
+# Process (convert processes to netlists) - Required, not optimization
+proc
+
+# FSM extraction
+fsm
+
+# Memory handling (no optimization)
+memory -nomap
+
+# Flatten hierarchy for full analysis
+flatten
+
+# Technology mapping to generic gates (required for gate count)
+techmap
+
+# ABC mapping with CMOS gates (required for realistic gate count)
+abc -g cmos
+
+# === Generate Reports ===
+
+# Hierarchy report
+tee -o reports/hierarchy_full.txt hierarchy -top ethercat_ipcore_top
+
+# Full statistics
+tee -o reports/stat_full.txt stat
+
+# Cell count by type
+tee -o reports/cells_full.txt select -count t:*
+
+# Timing analysis (longest topological path)
+tee -o reports/timing_full.txt ltp
+
+# Write gate-level netlist
+write_verilog reports/netlist_gates.v

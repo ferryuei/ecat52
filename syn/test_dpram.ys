@@ -1,0 +1,7 @@
+read_verilog -sv -I../rtl ../rtl/ecat_dpram.sv
+hierarchy -top ecat_dpram
+proc
+opt
+memory
+opt
+stat
