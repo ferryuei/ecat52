@@ -128,6 +128,7 @@ module ecat_dc #(
     reg [15:0]  sync0_pulse_counter;
     reg         sync0_pulse;
     reg         sync0_armed;
+    reg         sync0_prev_pulse;  // For SYNC1 associated mode edge detection
     
     // SYNC1 Registers
     reg [31:0]  sync1_cycle_time;
@@ -227,6 +228,7 @@ module ecat_dc #(
             sync0_pulse <= 1'b0;
             sync0_pulse_counter <= 16'h0;
             sync0_next_time <= 64'h0;
+            sync0_prev_pulse <= 1'b0;
         end else begin
             // Check if SYNC0 is enabled
             if (dc_activation[DC_ACT_SYNC0_EN]) begin
@@ -261,6 +263,8 @@ module ecat_dc #(
                 sync0_armed <= 1'b0;
                 sync0_pulse <= 1'b0;
             end
+            // Update previous pulse state for SYNC1 associated mode
+            sync0_prev_pulse <= sync0_pulse;
         end
     end
     
@@ -296,9 +300,10 @@ module ecat_dc #(
                     // Associated mode: SYNC1 follows SYNC0 with phase shift
                     if (sync0_armed) begin
                         sync1_armed <= 1'b1;
-                        // Calculate SYNC1 time based on SYNC0 + shift
-                        if (sync0_pulse && sync0_pulse_counter == ((sync_impulse_length > 1) ? (sync_impulse_length - 1) : 16'd9)) begin
-                            // Schedule SYNC1 after shift from SYNC0
+                        
+                        // Detect sync0_pulse start to schedule sync1
+                        if (sync0_pulse && !sync0_prev_pulse) begin
+                            // Schedule SYNC1 after shift from SYNC0 activation
                             sync1_next_time <= system_time + {32'b0, sync1_start_shift};
                         end
                         

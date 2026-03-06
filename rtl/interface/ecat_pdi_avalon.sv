@@ -299,10 +299,10 @@ module ecat_pdi_avalon #(
             if (avs_read || avs_write) begin
                 global_watchdog <= '0;  // Reset on any access
                 pdi_watchdog_timeout <= 1'b0;
-            end else if (pdi_enable && global_watchdog < 20'd1000000) begin
+            end else if (pdi_enable && global_watchdog < 20'd100000) begin  // Reduced from 1000000 to 100000 for 2ms timeout (assuming 50MHz clock)
                 global_watchdog <= global_watchdog + 1;
-            end else if (global_watchdog >= 20'd1000000) begin
-                pdi_watchdog_timeout <= 1'b1;  // 20ms timeout
+            end else if (global_watchdog >= 20'd100000) begin  // Reduced from 1000000 to 100000 for 2ms timeout
+                pdi_watchdog_timeout <= 1'b1;  // 2ms timeout instead of 20ms
             end
         end
     end
