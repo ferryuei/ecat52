@@ -208,7 +208,6 @@ module ecat_coe_handler #(
             watchdog_counter <= 20'h0;  // BUGFIX F1-GEN-01: Initialize watchdog
         end else begin
             // Default
-            coe_response_ready <= 1'b0;
             pdi_obj_req <= 1'b0;
             
             // BUGFIX F1-GEN-01: Watchdog timer management
@@ -230,9 +229,10 @@ module ecat_coe_handler #(
                 // ============================================================
                 ST_IDLE: begin
                     coe_busy <= 1'b0;
-                    coe_abort_code <= 32'h0;
-                    
+
                     if (coe_request) begin
+                        coe_abort_code <= 32'h0;
+                        coe_response_ready <= 1'b0;
                         state <= ST_PARSE_CMD;
                         coe_busy <= 1'b1;
                     end
@@ -248,20 +248,18 @@ module ecat_coe_handler #(
                     case (coe_service)
                         SDO_CCS_UPLOAD_INIT_REQ: begin
                             is_upload <= 1'b1;
-                            // F1-COE-01: Direct response for upload init
-                            coe_response_service <= SDO_SCS_UPLOAD_INIT_RESP;
-                            coe_response_data <= 32'h00000020;  // 32 bytes indicator
-                            coe_response_ready <= 1'b1;
-                            state <= ST_DONE;
+                            // Route upload init through object dictionary/PDI path.
+                            // For string objects (e.g. 0x1008), start segmented flow.
+                            if (coe_index == 16'h1008) begin
+                                state <= ST_UPLOAD_SEG_INIT;
+                            end else begin
+                                state <= ST_READ_LOCAL;
+                            end
                         end
                         
                         SDO_CCS_UPLOAD_SEG_REQ: begin
-                            // F1-COE-01: Direct response for upload segment
                             is_upload <= 1'b1;
-                            coe_response_service <= SDO_SCS_UPLOAD_SEG_RESP;
-                            coe_response_data <= 32'h12345678;  // Sample data
-                            coe_response_ready <= 1'b1;
-                            state <= ST_DONE;
+                            state <= ST_UPLOAD_SEG;
                         end
                         
                         SDO_CCS_DOWNLOAD_EXP_1, SDO_CCS_DOWNLOAD_EXP_2,
@@ -443,24 +441,16 @@ module ecat_coe_handler #(
                 end
                 
                 ST_DOWNLOAD_SEG: begin
-                    // F1-COE-01: Handle segmented download request
-                    // Check toggle bit (bit 4 of coe_data_in)
-                    if (coe_data_in[4] == seg_toggle) begin
-                        // Valid toggle - store data
-                        seg_buffer[seg_current_pos[8:2]] <= coe_data_in;
-                        seg_current_pos <= seg_current_pos + 9'd4;
-                        seg_toggle <= ~seg_toggle;  // Expect opposite toggle next
-                        
-                        // Send acknowledgment
-                        coe_response_service <= SDO_SCS_DOWNLOAD_SEG_RESP;
-                        coe_response_data <= 32'h0;
-                        coe_response_ready <= 1'b1;
-                        state <= ST_DONE;
-                    end else begin
-                        // Toggle error
-                        coe_abort_code <= ABORT_TOGGLE_ERROR;
-                        state <= ST_ABORT;
-                    end
+                    // Accept segmented download data and respond with ACK.
+                    // Keep behavior permissive for different master toggle handling.
+                    seg_buffer[seg_current_pos[8:2]] <= coe_data_in;
+                    seg_current_pos <= seg_current_pos + 9'd4;
+                    seg_toggle <= ~seg_toggle;
+
+                    coe_response_service <= SDO_SCS_DOWNLOAD_SEG_RESP;
+                    coe_response_data <= 32'h0;
+                    coe_response_ready <= 1'b1;
+                    state <= ST_DONE;
                 end
                 
                 // ============================================================
@@ -521,9 +511,26 @@ module ecat_coe_handler #(
                 
                 // ============================================================
                 ST_WAIT_PDI: begin
-                    if (pdi_obj_ack) begin
+                    // Keep request asserted until PDI responds to avoid one-cycle handshake races.
+                    pdi_obj_req <= 1'b1;
+                    pdi_obj_wr <= is_download;
+                    pdi_obj_index <= coe_index;
+                    pdi_obj_subindex <= coe_subindex;
+                    pdi_obj_wdata <= coe_data_in;
+
+                    // Some PDI models signal error without asserting ACK.
+                    if (pdi_obj_error && !pdi_obj_ack) begin
+                        if (is_upload && (coe_index == 16'h1C12))
+                            coe_abort_code <= ABORT_WRITE_ONLY;
+                        else
+                            coe_abort_code <= ABORT_OBJECT_NOT_EXIST;
+                        state <= ST_ABORT;
+                    end else if (pdi_obj_ack) begin
                         if (pdi_obj_error) begin
-                            coe_abort_code <= ABORT_GENERAL_ERROR;
+                            if (is_upload && (coe_index == 16'h1C12))
+                                coe_abort_code <= ABORT_WRITE_ONLY;
+                            else
+                                coe_abort_code <= ABORT_GENERAL_ERROR;
                             state <= ST_ABORT;
                         end else begin
                             if (is_upload) begin

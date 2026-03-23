@@ -132,7 +132,8 @@ VERILOG_TESTS = \
 IVERILOG_TESTS = \
 	tb_dpram \
 	tb_register_map \
-	tb_al_statemachine
+	tb_al_statemachine \
+	tb_mailbox_handler
 
 # ============================================================================
 # Default Target
@@ -435,6 +436,11 @@ iverilog-tb_al_statemachine: $(BUILD_DIR) $(WAVE_DIR)
 	$(IVERILOG) $(IVERILOG_FLAGS) -o $(BUILD_DIR)/tb_al_statemachine.iv \
 		$(RTL_DIR)/control/ecat_al_statemachine.sv $(TB_V_DIR)/tb_al_statemachine.v
 
+iverilog-tb_mailbox_handler: $(BUILD_DIR) $(WAVE_DIR)
+	@echo "=== Building tb_mailbox_handler (iverilog) ==="
+	$(IVERILOG) $(IVERILOG_FLAGS) -o $(BUILD_DIR)/tb_mailbox_handler.iv \
+		$(RTL_DIR)/mailbox/ecat_mailbox_handler.sv $(TB_V_DIR)/tb_mailbox_handler.v
+
 iverilog-run: iverilog-all
 	@echo ""
 	@echo "=========================================="
@@ -450,6 +456,36 @@ iverilog-run: iverilog-all
 	@echo "=========================================="
 	@echo "All iverilog tests complete!"
 	@echo "=========================================="
+
+# ============================================================================
+# VCS Testbench Targets
+# ============================================================================
+
+.PHONY: check-vcs vcs-run vcs-run-nocov vcs-run-tests
+
+check-vcs:
+	@which vcs > /dev/null 2>&1 || (echo "Error: vcs not found in PATH" && exit 1)
+	@which urg > /dev/null 2>&1 || (echo "Error: urg not found in PATH" && exit 1)
+
+vcs-run: check-vcs
+	@echo "=========================================="
+	@echo "Running VCS Regression (with coverage)"
+	@echo "=========================================="
+	@./vcs_regression.sh
+
+vcs-run-nocov: check-vcs
+	@echo "=========================================="
+	@echo "Running VCS Regression (no coverage)"
+	@echo "=========================================="
+	@./vcs_regression.sh --no-cov
+
+vcs-run-tests: check-vcs
+	@if [ -z "$(TESTS)" ]; then \
+		echo "Usage: make vcs-run-tests TESTS=tb_dpram,tb_pdi"; \
+		exit 1; \
+	fi
+	@echo "Running selected VCS tests: $(TESTS)"
+	@./vcs_regression.sh --tests $(TESTS)
 
 # ============================================================================
 # Yosys Synthesis Targets
@@ -600,6 +636,11 @@ help:
 	@echo "  make iverilog-all        - Build iverilog-compatible tests"
 	@echo "  make iverilog-run        - Build and run iverilog tests"
 	@echo ""
+	@echo "VCS Targets:"
+	@echo "  make vcs-run             - Run full VCS regression with coverage"
+	@echo "  make vcs-run-nocov       - Run full VCS regression without coverage"
+	@echo "  make vcs-run-tests TESTS=tb_a,tb_b - Run selected VCS tests"
+	@echo ""
 	@echo "Yosys Synthesis Targets:"
 	@echo "  make synth               - Generic FPGA synthesis"
 	@echo "  make synth-xilinx        - Xilinx-targeted synthesis"
@@ -639,5 +680,5 @@ list:
 	@echo "Integration Test (full system):"
 	@echo "  tb_ethercat_top  - Full IP core with PHY, PDI, DC, EEPROM"
 	@echo ""
-	@echo "iverilog-compatible (3 tests):"
+	@echo "iverilog-compatible (4 tests):"
 	@for t in $(IVERILOG_TESTS); do echo "  $$t"; done

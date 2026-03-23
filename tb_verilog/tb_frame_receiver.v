@@ -49,6 +49,13 @@ wire                    fwd_sof;
 wire                    fwd_eof;
 wire                    fwd_modified;
 
+// Frame metadata
+wire                    frame_rx_valid;
+wire [47:0]             frame_src_mac;
+wire [47:0]             frame_dst_mac;
+wire                    frame_is_ecat;
+wire                    frame_crc_error;
+
 // Statistics
 wire [15:0]             rx_frame_count;
 wire [15:0]             rx_error_count;
@@ -83,6 +90,11 @@ ecat_frame_receiver dut (
     .mem_be(mem_be),
     .mem_wr_en(mem_wr_en),
     .mem_rd_en(mem_rd_en),
+    .frame_rx_valid(frame_rx_valid),
+    .frame_src_mac(frame_src_mac),
+    .frame_dst_mac(frame_dst_mac),
+    .frame_is_ecat(frame_is_ecat),
+    .frame_crc_error(frame_crc_error),
     .mem_ready(mem_ready),
     .mem_rdata(mem_rdata),
     .fwd_valid(fwd_valid),
@@ -608,6 +620,100 @@ task test_frame_error;
     end
 endtask
 
+
+// ============================================================================
+// Test 15: Transparent Ethernet Frame Path (non-EtherCAT EtherType)
+// ============================================================================
+task test_transparent_eth_frame;
+    reg [15:0] initial_frames;
+    reg [15:0] initial_errors;
+    begin
+        $display("\n=== TEST 15: Transparent Ethernet Path ===");
+        reset_dut;
+        initial_frames = rx_frame_count;
+        initial_errors = rx_error_count;
+
+        // Ethernet header: dst(6) + src(6) + EtherType=0x0800 (non-EtherCAT)
+        frame_data[0]=8'hDA; frame_data[1]=8'h02; frame_data[2]=8'h03; frame_data[3]=8'h04; frame_data[4]=8'h05; frame_data[5]=8'h06;
+        frame_data[6]=8'h5A; frame_data[7]=8'h12; frame_data[8]=8'h13; frame_data[9]=8'h14; frame_data[10]=8'h15; frame_data[11]=8'h16;
+        frame_data[12]=8'h08; frame_data[13]=8'h00;
+        frame_data[14]=8'hAA; frame_data[15]=8'hBB; frame_data[16]=8'hCC; frame_data[17]=8'hDD;
+        frame_data[18]=8'h11; frame_data[19]=8'h22; frame_data[20]=8'h33; frame_data[21]=8'h44;
+
+        frame_len = 22;
+        send_frame(frame_len);
+
+        check_pass("Transparent frame counted", rx_frame_count > initial_frames);
+        check_pass("Not marked as EtherCAT", frame_is_ecat == 1'b0);
+        check_pass("Transparent CRC path exercised", rx_error_count > initial_errors);
+    end
+endtask
+
+// ============================================================================
+// Test 16: EtherCAT Header + Datagram Decode Path
+// ============================================================================
+task test_ethercat_header_path;
+    reg [15:0] initial_frames;
+    reg [15:0] initial_wkc;
+    begin
+        $display("\n=== TEST 16: EtherCAT Header Decode Path ===");
+        reset_dut;
+        initial_frames = rx_frame_count;
+        initial_wkc = wkc_increment_count;
+
+        // Ethernet header: EtherType=0x88A4
+        frame_data[0]=8'hFF; frame_data[1]=8'hFF; frame_data[2]=8'hFF; frame_data[3]=8'hFF; frame_data[4]=8'hFF; frame_data[5]=8'hFF;
+        frame_data[6]=8'h00; frame_data[7]=8'h11; frame_data[8]=8'h22; frame_data[9]=8'h33; frame_data[10]=8'h44; frame_data[11]=8'h55;
+        frame_data[12]=8'h88; frame_data[13]=8'hA4;
+
+        // EtherCAT header (2 bytes)
+        frame_data[14]=8'h0E;
+        frame_data[15]=8'h10;
+
+        // Datagram header (10 bytes): BWR to ADO 0x0120, len=2
+        frame_data[16]=8'h08;  // CMD BWR
+        frame_data[17]=8'h01;  // IDX
+        frame_data[18]=8'h00; frame_data[19]=8'h00; // ADP
+        frame_data[20]=8'h20; frame_data[21]=8'h01; // ADO
+        frame_data[22]=8'h02; frame_data[23]=8'h00; // LEN
+        frame_data[24]=8'h00; frame_data[25]=8'h00; // IRQ/RES
+
+        // Data + WKC
+        frame_data[26]=8'h02; frame_data[27]=8'h00;
+        frame_data[28]=8'h00; frame_data[29]=8'h00;
+
+        frame_len = 30;
+        send_frame(frame_len);
+
+        check_pass("EtherCAT frame counted", rx_frame_count > initial_frames);
+        check_pass("Marked as EtherCAT", frame_is_ecat == 1'b1);
+        check_pass("Datagram WKC path exercised", wkc_increment_count > initial_wkc);
+    end
+endtask
+
+// ============================================================================
+// Test 17: IDLE-State Error Detection Path
+// ============================================================================
+task test_idle_error_path;
+    reg [15:0] initial_errors;
+    begin
+        $display("\n=== TEST 17: IDLE Error Path ===");
+        reset_dut;
+        initial_errors = rx_error_count;
+
+        @(posedge clk);
+        rx_valid = 1'b1;
+        rx_sof = 1'b0;
+        rx_error = 1'b1;
+        rx_data = 8'hEE;
+        @(posedge clk);
+        rx_valid = 1'b0;
+        rx_error = 1'b0;
+
+        repeat(5) @(posedge clk);
+        check_pass("IDLE error path increments counter", rx_error_count > initial_errors);
+    end
+endtask
 // ============================================================================
 // Main Test Sequence
 // ============================================================================
@@ -633,7 +739,9 @@ initial begin
     test_armw_frame;
     test_wkc_count;
     test_frame_error;
-    
+    test_transparent_eth_frame;
+    test_ethercat_header_path;
+    test_idle_error_path;
     // Summary
     $display("\n========================================");
     $display("Frame Receiver Test Summary:");

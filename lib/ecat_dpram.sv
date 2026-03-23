@@ -77,7 +77,7 @@ module ecat_dpram #(
     // ECAT Port Logic (Port A)
     // ========================================================================
     
-    always_ff @(posedge clk or negedge rst_n) begin
+    always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             ecat_ack <= 1'b0;
             ecat_rdata <= '0;
@@ -122,7 +122,7 @@ module ecat_dpram #(
     // PDI Port Logic (Port B)
     // ========================================================================
     
-    always_ff @(posedge clk or negedge rst_n) begin
+    always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             pdi_ack <= 1'b0;
             pdi_rdata <= '0;
@@ -176,7 +176,7 @@ module ecat_dpram #(
     // Collision Counter
     // ========================================================================
     
-    always_ff @(posedge clk or negedge rst_n) begin
+    always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             collision_count <= 16'h0000;
         end else begin

@@ -79,7 +79,7 @@ module ecat_sii_controller #(
     reg [15:0] clk_cnt;
     reg        clk_tick;   // Quarter-period tick
     
-    always_ff @(posedge clk or negedge rst_n) begin
+    always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             clk_cnt <= '0;
             clk_tick <= 1'b0;
@@ -148,7 +148,7 @@ module ecat_sii_controller #(
     // ========================================================================
     // Register Interface
     // ========================================================================
-    always_ff @(posedge clk or negedge rst_n) begin
+    always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             reg_rdata <= 32'h0;
             reg_ack <= 1'b0;
@@ -211,7 +211,7 @@ module ecat_sii_controller #(
     // ========================================================================
     // I2C State Machine
     // ========================================================================
-    always_ff @(posedge clk or negedge rst_n) begin
+    always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             i2c_state <= ST_IDLE;
             i2c_scl_o <= 1'b1;

@@ -309,8 +309,8 @@ module ecat_port_controller #(
     } redundancy_state_t;
     
     redundancy_state_t red_state;
-    reg [15:0] failover_timer;
-    reg [15:0] recovery_timer;
+    reg [22:0] failover_timer;
+    reg [22:0] recovery_timer;
     reg        primary_port_up;
     reg        backup_port_up;
     
@@ -320,8 +320,8 @@ module ecat_port_controller #(
     localparam RED_MODE_RING = 2'b10;
     
     // Failover/recovery timing (in clock cycles, ~10ms at 100MHz)
-    localparam FAILOVER_TIME = 16'd1000000;
-    localparam RECOVERY_TIME = 16'd5000000;  // 50ms
+    localparam [22:0] FAILOVER_TIME = 23'd1000000;
+    localparam [22:0] RECOVERY_TIME = 23'd5000000;  // 50ms
     
     generate
         if (REDUNDANCY_EN && NUM_PORTS >= 2) begin : gen_redundancy
@@ -332,8 +332,8 @@ module ecat_port_controller #(
                     active_path <= 2'b00;
                     path_switched <= 1'b0;
                     switch_count <= 16'h0;
-                    failover_timer <= 16'h0;
-                    recovery_timer <= 16'h0;
+                    failover_timer <= 23'h0;
+                    recovery_timer <= 23'h0;
                     primary_port_up <= 1'b0;
                     backup_port_up <= 1'b0;
                 end else begin

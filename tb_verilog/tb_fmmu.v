@@ -203,21 +203,25 @@ task log_write_op;
     input [31:0] data;
     output success;
     begin
+        // Wait for DUT to become idle and clear prior response flags.
+        while (fmmu_active || phy_req || log_ack || log_err) @(posedge clk);
+
         @(posedge clk);
         log_req = 1;
         log_addr = addr;
         log_wr = 1;
         log_wdata = data;
         log_len = 1;
-        
+
         timeout_cnt = 0;
         while (!log_ack && !log_err && timeout_cnt < TIMEOUT_CYCLES) begin
             @(posedge clk);
             timeout_cnt = timeout_cnt + 1;
         end
-        
+
         success = log_ack && !log_err;
         log_req = 0;
+        @(posedge clk);
         @(posedge clk);
     end
 endtask

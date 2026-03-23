@@ -78,7 +78,7 @@ module ecat_mdio_master #(
     reg [7:0]   clk_cnt;
     reg         mdc_tick;   // Half-period tick
     
-    always_ff @(posedge clk or negedge rst_n) begin
+    always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             clk_cnt <= 8'h0;
             mdc_tick <= 1'b0;
@@ -133,7 +133,7 @@ module ecat_mdio_master #(
     // ========================================================================
     // Register Interface
     // ========================================================================
-    always_ff @(posedge clk or negedge rst_n) begin
+    always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             reg_rdata <= 16'h0;
             reg_ack <= 1'b0;
@@ -180,7 +180,7 @@ module ecat_mdio_master #(
     // ========================================================================
     // MDIO State Machine
     // ========================================================================
-    always_ff @(posedge clk or negedge rst_n) begin
+    always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             state <= ST_IDLE;
             mdc <= 1'b0;

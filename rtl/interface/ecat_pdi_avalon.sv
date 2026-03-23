@@ -99,7 +99,7 @@ module ecat_pdi_avalon #(
     // State Machine
     // ========================================================================
     
-    always_ff @(posedge clk or negedge rst_n) begin
+    always @(posedge clk or negedge rst_n) begin
         if (!rst_n)
             state <= IDLE;
         else
@@ -158,7 +158,7 @@ module ecat_pdi_avalon #(
     // Address Decode and Control Logic
     // ========================================================================
     
-    always_ff @(posedge clk or negedge rst_n) begin
+    always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             avs_waitrequest <= 1'b0;
             avs_readdatavalid <= 1'b0;
@@ -291,7 +291,7 @@ module ecat_pdi_avalon #(
     // ========================================================================
     reg [19:0] global_watchdog;
     
-    always_ff @(posedge clk or negedge rst_n) begin
+    always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             global_watchdog <= '0;
             pdi_watchdog_timeout <= 1'b0;
@@ -311,7 +311,7 @@ module ecat_pdi_avalon #(
     // IRQ Generation
     // ========================================================================
     
-    always_ff @(posedge clk or negedge rst_n) begin
+    always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             irq_latched <= '0;
             pdi_irq <= 1'b0;
@@ -333,7 +333,7 @@ module ecat_pdi_avalon #(
     // PDI Operational Status
     // ========================================================================
     
-    always_ff @(posedge clk or negedge rst_n) begin
+    always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             pdi_operational <= 1'b1;
         end else begin

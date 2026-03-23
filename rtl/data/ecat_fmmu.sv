@@ -367,9 +367,9 @@ module ecat_fmmu_array #(
     
     // Physical address interface
     output wire                     phy_req,
-    output wire [ADDR_WIDTH-1:0]    phy_addr,
-    output wire                     phy_wr,
-    output wire [DATA_WIDTH-1:0]    phy_wdata,
+    output reg  [ADDR_WIDTH-1:0]    phy_addr,
+    output reg                      phy_wr,
+    output reg  [DATA_WIDTH-1:0]    phy_wdata,
     input  wire                     phy_ack,
     input  wire [DATA_WIDTH-1:0]    phy_rdata,
     
@@ -378,21 +378,40 @@ module ecat_fmmu_array #(
 );
 
     // FMMU instances
-    wire [NUM_FMMU-1:0] fmmu_log_ack;
-    wire [NUM_FMMU-1:0] fmmu_log_err;
-    wire [NUM_FMMU-1:0] fmmu_phy_req;
-    wire [NUM_FMMU-1:0] fmmu_active;
-    wire [NUM_FMMU-1:0] fmmu_error;
-    wire [7:0]          fmmu_error_code [NUM_FMMU-1:0];
-    wire [ADDR_WIDTH-1:0] fmmu_phy_addr [NUM_FMMU-1:0];
-    wire [NUM_FMMU-1:0] fmmu_phy_wr;
-    wire [DATA_WIDTH-1:0] fmmu_phy_wdata [NUM_FMMU-1:0];
-    wire [DATA_WIDTH-1:0] fmmu_log_rdata [NUM_FMMU-1:0];
-    wire [DATA_WIDTH-1:0] fmmu_cfg_rdata [NUM_FMMU-1:0];
+    wire [NUM_FMMU-1:0]             fmmu_log_ack;
+    wire [NUM_FMMU-1:0]             fmmu_log_err;
+    wire [NUM_FMMU-1:0]             fmmu_phy_req;
+    wire [NUM_FMMU-1:0]             fmmu_active;
+    wire [NUM_FMMU-1:0]             fmmu_error;
+    wire [NUM_FMMU*8-1:0]           fmmu_error_code_bus;
+    wire [NUM_FMMU*ADDR_WIDTH-1:0]  fmmu_phy_addr_bus;
+    wire [NUM_FMMU-1:0]             fmmu_phy_wr;
+    wire [NUM_FMMU*DATA_WIDTH-1:0]  fmmu_phy_wdata_bus;
+    wire [NUM_FMMU*DATA_WIDTH-1:0]  fmmu_log_rdata_bus;
+    wire [NUM_FMMU*DATA_WIDTH-1:0]  fmmu_cfg_rdata_bus;
     
     // Generate FMMU instances
     generate
         for (genvar i = 0; i < NUM_FMMU; i++) begin : gen_fmmu
+            localparam integer IDX = i;
+            localparam integer CFG_BASE = i * DATA_WIDTH;
+            localparam integer LOG_BASE = i * DATA_WIDTH;
+            localparam integer PHY_ADDR_BASE = i * ADDR_WIDTH;
+            localparam integer PHY_DATA_BASE = i * DATA_WIDTH;
+            localparam integer ERR_BASE = i * 8;
+
+            wire                  fmmu_log_ack_i;
+            wire                  fmmu_log_err_i;
+            wire                  fmmu_phy_req_i;
+            wire                  fmmu_active_i;
+            wire                  fmmu_error_i;
+            wire                  fmmu_phy_wr_i;
+            wire [DATA_WIDTH-1:0] cfg_rdata_i;
+            wire [DATA_WIDTH-1:0] log_rdata_i;
+            wire [ADDR_WIDTH-1:0] phy_addr_i;
+            wire [DATA_WIDTH-1:0] phy_wdata_i;
+            wire [7:0]            fmmu_error_code_i;
+
             ecat_fmmu #(
                 .FMMU_ID(i),
                 .ADDR_WIDTH(ADDR_WIDTH),
@@ -405,28 +424,38 @@ module ecat_fmmu_array #(
                 .cfg_wr(cfg_wr && (cfg_fmmu_sel == i)),
                 .cfg_addr(cfg_addr),
                 .cfg_wdata(cfg_wdata),
-                .cfg_rdata(fmmu_cfg_rdata[i]),
+                .cfg_rdata(cfg_rdata_i),
                 .log_req(log_req),
                 .log_addr(log_addr),
                 .log_len(log_len),
                 .log_wr(log_wr),
                 .log_wdata(log_wdata),
-                .log_ack(fmmu_log_ack[i]),
-                .log_rdata(fmmu_log_rdata[i]),
-                .log_err(fmmu_log_err[i]),
-                .phy_req(fmmu_phy_req[i]),
-                .phy_addr(fmmu_phy_addr[i]),
-                .phy_wr(fmmu_phy_wr[i]),
-                .phy_wdata(fmmu_phy_wdata[i]),
-                .phy_ack(phy_ack && fmmu_active[i]),
+                .log_ack(fmmu_log_ack_i),
+                .log_rdata(log_rdata_i),
+                .log_err(fmmu_log_err_i),
+                .phy_req(fmmu_phy_req_i),
+                .phy_addr(phy_addr_i),
+                .phy_wr(fmmu_phy_wr_i),
+                .phy_wdata(phy_wdata_i),
+                .phy_ack(phy_ack && fmmu_active_i),
                 .phy_rdata(phy_rdata),
-                .fmmu_active(fmmu_active[i]),
-                .fmmu_error(fmmu_error[i]),
-                .fmmu_error_code(fmmu_error_code[i])
+                .fmmu_active(fmmu_active_i),
+                .fmmu_error(fmmu_error_i),
+                .fmmu_error_code(fmmu_error_code_i)
             );
-            
-            // Pack error codes for output
-            assign fmmu_error_codes[i*8 +: 8] = fmmu_error_code[i];
+
+            assign fmmu_log_ack[IDX] = fmmu_log_ack_i;
+            assign fmmu_log_err[IDX] = fmmu_log_err_i;
+            assign fmmu_phy_req[IDX] = fmmu_phy_req_i;
+            assign fmmu_active[IDX] = fmmu_active_i;
+            assign fmmu_error[IDX] = fmmu_error_i;
+            assign fmmu_phy_wr[IDX] = fmmu_phy_wr_i;
+            assign fmmu_cfg_rdata_bus[CFG_BASE +: DATA_WIDTH] = cfg_rdata_i;
+            assign fmmu_log_rdata_bus[LOG_BASE +: DATA_WIDTH] = log_rdata_i;
+            assign fmmu_phy_addr_bus[PHY_ADDR_BASE +: ADDR_WIDTH] = phy_addr_i;
+            assign fmmu_phy_wdata_bus[PHY_DATA_BASE +: DATA_WIDTH] = phy_wdata_i;
+            assign fmmu_error_code_bus[ERR_BASE +: 8] = fmmu_error_code_i;
+            assign fmmu_error_codes[ERR_BASE +: 8] = fmmu_error_code_i;
         end
     endgenerate
     
@@ -448,19 +477,23 @@ module ecat_fmmu_array #(
     assign phy_req = |fmmu_phy_req;
     
     always_comb begin
-        if (active_fmmu >= 0) begin
-            phy_addr = fmmu_phy_addr[active_fmmu];
-            phy_wr = fmmu_phy_wr[active_fmmu];
-            phy_wdata = fmmu_phy_wdata[active_fmmu];
-            log_rdata = fmmu_log_rdata[active_fmmu];
-        end else begin
-            phy_addr = '0;
-            phy_wr = 1'b0;
-            phy_wdata = '0;
-            log_rdata = '0;
+        phy_addr = '0;
+        phy_wr = 1'b0;
+        phy_wdata = '0;
+        log_rdata = '0;
+        cfg_rdata = '0;
+
+        for (int j = 0; j < NUM_FMMU; j++) begin
+            if (cfg_fmmu_sel == j[7:0])
+                cfg_rdata = fmmu_cfg_rdata_bus[j*DATA_WIDTH +: DATA_WIDTH];
+
+            if (active_fmmu == j) begin
+                phy_addr = fmmu_phy_addr_bus[j*ADDR_WIDTH +: ADDR_WIDTH];
+                phy_wr = fmmu_phy_wr[j];
+                phy_wdata = fmmu_phy_wdata_bus[j*DATA_WIDTH +: DATA_WIDTH];
+                log_rdata = fmmu_log_rdata_bus[j*DATA_WIDTH +: DATA_WIDTH];
+            end
         end
-        
-        cfg_rdata = fmmu_cfg_rdata[cfg_fmmu_sel];
     end
 
 endmodule

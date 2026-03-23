@@ -304,6 +304,9 @@ task test_mbx02_coe_dispatch;
         wait_for_response(got_irq);
         $display("  got_irq=%0d, sm1_full=%0d", got_irq, sm1_mailbox_full);
         check_pass("Response IRQ generated", got_irq);
+        check_pass("CoE response length low byte is 9", sim_mem[SM1_ADDR + 0] == 8'h09);
+        check_pass("CoE response length high byte is 0", sim_mem[SM1_ADDR + 1] == 8'h00);
+        check_pass("CoE response payload byte 8 written", sim_mem[SM1_ADDR + 14] == 8'hDE);
 
         sm0_mailbox_full = 0;
         repeat(5) @(posedge clk);
@@ -428,6 +431,8 @@ task test_mbx07_coe_abort;
         wait_for_response(got_irq);
         $display("  got_irq=%0d, SM1 type=0x%02x", got_irq, sim_mem[SM1_ADDR + 5]);
         check_pass("Abort response generated", got_irq);
+        check_pass("Abort response length low byte is 9", sim_mem[SM1_ADDR + 0] == 8'h09);
+        check_pass("Abort response abort-code MSB written", sim_mem[SM1_ADDR + 14] == 8'h06);
 
         sm0_mailbox_full = 0;
         repeat(5) @(posedge clk);

@@ -119,7 +119,7 @@ module ecat_al_statemachine (
             // Capture new target state from master
             if (al_control_changed) begin
                 /* verilator lint_off ENUMVALUE */
-                target_state <= al_control_req;  // Direct assign (iverilog/Verilator compatible)
+                target_state <= al_state_t'(al_control_req);
                 /* verilator lint_on ENUMVALUE */
             end
             
@@ -138,9 +138,9 @@ module ecat_al_statemachine (
                     end else begin
                         // Transition failed, enter error state
                         /* verilator lint_off ENUMVALUE */
-                        current_state <= get_error_state(current_state);
+                        current_state <= al_state_t'(get_error_state(current_state));
                         /* verilator lint_on ENUMVALUE */
-                        al_status <= get_error_state(current_state);
+                        al_status <= al_state_t'(get_error_state(current_state));
                         al_status_code <= error_code;
                         al_event_irq <= 1'b1;
                     end

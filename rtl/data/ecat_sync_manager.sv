@@ -149,7 +149,7 @@ module ecat_sync_manager #(
     // Configuration Register Access
     // ========================================================================
     
-    always_ff @(posedge clk or negedge rst_n) begin
+    always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             start_addr <= 16'h0000;
             length <= 16'h0000;
@@ -195,7 +195,7 @@ module ecat_sync_manager #(
     // Watchdog Timer (SM-05)
     // ========================================================================
     
-    always_ff @(posedge clk or negedge rst_n) begin
+    always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             watchdog_counter <= 16'hFFFF;
             watchdog_timeout <= 16'h1000;  // Default timeout
@@ -250,7 +250,7 @@ module ecat_sync_manager #(
     reg         current_is_ecat;
     
     // State register
-    always_ff @(posedge clk or negedge rst_n) begin
+    always @(posedge clk or negedge rst_n) begin
         if (!rst_n)
             state <= SM_IDLE;
         else
@@ -314,7 +314,7 @@ module ecat_sync_manager #(
     end
     
     // Output and buffer management logic
-    always_ff @(posedge clk or negedge rst_n) begin
+    always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             ecat_ack <= 1'b0;
             ecat_rdata <= '0;
@@ -651,16 +651,11 @@ module ecat_sync_manager_array #(
     assign pdi_ack = |sm_pdi_ack;
     assign mem_req = |sm_mem_req;
     
+    assign mem_wr = (active_sm_mem < NUM_SM) ? sm_mem_wr[active_sm_mem] : 1'b0;
+    assign mem_addr = (active_sm_mem < NUM_SM) ? sm_mem_addr[active_sm_mem] : '0;
+    assign mem_wdata = (active_sm_mem < NUM_SM) ? sm_mem_wdata[active_sm_mem] : '0;
+
     always_comb begin
-        if (active_sm_mem < NUM_SM) begin
-            mem_wr = sm_mem_wr[active_sm_mem];
-            mem_addr = sm_mem_addr[active_sm_mem];
-            mem_wdata = sm_mem_wdata[active_sm_mem];
-        end else begin
-            mem_wr = 1'b0;
-            mem_addr = '0;
-            mem_wdata = '0;
-        end
         
         // Data output multiplexing
         ecat_rdata = '0;

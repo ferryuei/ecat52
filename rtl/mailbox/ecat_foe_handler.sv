@@ -9,7 +9,8 @@
 module ecat_foe_handler #(
     parameter FLASH_ADDR_WIDTH = 24,      // Flash address width
     parameter MAX_FILE_SIZE = 24'h100000, // 1MB max file size
-    parameter TIMEOUT_CYCLES = 100000     // BUGFIX F1-GEN-01: Timeout = 1ms @ 100MHz
+    parameter TIMEOUT_CYCLES = 100000,    // BUGFIX F1-GEN-01: Timeout = 1ms @ 100MHz
+    parameter WRITE_PASSWORD = 32'h0000_0000 // Default FoE write password
 )(
     // System signals
     input  wire                     rst_n,
@@ -230,8 +231,8 @@ module ecat_foe_handler #(
                 // ============================================================
                 ST_IDLE: begin
                     foe_busy <= 1'b0;
-                    foe_active <= 1'b0;
-                    foe_progress <= 8'h0;
+                    if (!foe_active)
+                        foe_progress <= 8'h0;
                     
                     if (foe_request) begin
                         foe_busy <= 1'b1;

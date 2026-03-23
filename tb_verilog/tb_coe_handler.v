@@ -254,6 +254,122 @@ task test_invalid_object_abort;
     end
 endtask
 
+
+// ============================================================================
+// Test: Subindex Abort on Local Object
+// ============================================================================
+task test_subindex_abort;
+    begin
+        $display("\n=== Test: Subindex Abort (0x1000:01) ===");
+        reset_dut;
+
+        sdo_upload(16'h1000, 8'h01);
+
+        check_pass("Subindex abort returned", coe_abort_code == 32'h06090011);
+    end
+endtask
+
+// ============================================================================
+// Test: Read-Only Object Download Abort
+// ============================================================================
+task test_read_only_download_abort;
+    begin
+        $display("\n=== Test: Read-Only Download Abort (0x1000) ===");
+        reset_dut;
+
+        sdo_download(16'h1000, 8'h00, 32'hDEADBEEF, 4);
+
+        check_pass("Read-only abort returned", coe_abort_code == 32'h06010002);
+    end
+endtask
+
+// ============================================================================
+// Test: Write-Only Object Upload Abort (via PDI error)
+// ============================================================================
+task test_write_only_upload_abort;
+    begin
+        $display("\n=== Test: Write-Only Upload Abort (0x1C12) ===");
+        reset_dut;
+
+        pdi_obj_error = 1;
+        sdo_upload(16'h1C12, 8'h00);
+        check_pass("Write-only abort returned", coe_abort_code == 32'h06010001);
+        pdi_obj_error = 0;
+    end
+endtask
+
+// ============================================================================
+// Test: Segmented Download Flow
+// ============================================================================
+task test_segmented_download;
+    begin
+        $display("\n=== Test: Segmented Download ===");
+        reset_dut;
+
+        coe_data_length = 8;
+        @(posedge clk);
+        coe_request = 1;
+        coe_service = 8'h21;  // Download init request
+        coe_index = 16'h1009;
+        coe_subindex = 8'h00;
+        coe_data_in = 32'h00000008;
+        @(posedge clk);
+        coe_request = 0;
+
+        timeout_cnt = 0;
+        while (!coe_response_ready && timeout_cnt < TIMEOUT_CYCLES) begin
+            @(posedge clk);
+            if (pdi_obj_req && !pdi_obj_ack)
+                pdi_obj_ack = 1;
+            else
+                pdi_obj_ack = 0;
+            timeout_cnt = timeout_cnt + 1;
+        end
+
+        check_pass("Segment init response", coe_response_ready == 1 && coe_abort_code == 0);
+
+        @(posedge clk);
+        coe_request = 1;
+        coe_service = 8'h00;  // Download segment request
+        coe_data_in = 32'hA55AA55A;
+        @(posedge clk);
+        coe_request = 0;
+
+        timeout_cnt = 0;
+        while (!coe_response_ready && timeout_cnt < TIMEOUT_CYCLES) begin
+            @(posedge clk);
+            timeout_cnt = timeout_cnt + 1;
+        end
+
+        check_pass("Segment response", coe_response_ready == 1 && coe_abort_code == 0);
+    end
+endtask
+
+// ============================================================================
+// Test: Invalid Command Specifier Abort
+// ============================================================================
+task test_invalid_cmd_abort;
+    begin
+        $display("\n=== Test: Invalid Command Abort ===");
+        reset_dut;
+
+        @(posedge clk);
+        coe_request = 1;
+        coe_service = 8'h55;
+        coe_index = 16'h1000;
+        coe_subindex = 8'h00;
+        @(posedge clk);
+        coe_request = 0;
+
+        timeout_cnt = 0;
+        while (!coe_response_ready && timeout_cnt < TIMEOUT_CYCLES) begin
+            @(posedge clk);
+            timeout_cnt = timeout_cnt + 1;
+        end
+
+        check_pass("Invalid command abort", coe_abort_code == 32'h05040001);
+    end
+endtask
 // ============================================================================
 // Main Test Sequence
 // ============================================================================
@@ -268,7 +384,11 @@ initial begin
     test_device_type_read;
     test_identity_object;
     test_invalid_object_abort;
-    
+    test_subindex_abort;
+    test_read_only_download_abort;
+    test_write_only_upload_abort;
+    test_segmented_download;
+    test_invalid_cmd_abort;
     // Summary
     $display("\n========================================");
     $display("CoE Handler Test Summary:");

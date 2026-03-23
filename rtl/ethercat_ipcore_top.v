@@ -275,7 +275,6 @@ module ethercat_ipcore_top #(
     wire [NUM_FMMU-1:0]    fmmu_write_enable;
     wire [NUM_FMMU-1:0]    fmmu_enable;
     wire [NUM_FMMU*8-1:0]  fmmu_error_codes;
-    reg  [7:0]             fmmu_err_latched;
 
     wire [NUM_SM*16-1:0]   sm_phys_start_addr;
     wire [NUM_SM*16-1:0]   sm_length;
@@ -1134,6 +1133,8 @@ module ethercat_ipcore_top #(
         end
     end
 
+    wire sm_mem_grant;
+
     assign fr_log_ack = fr_log_req && log_hit && !log_perm_err && dpram_ecat_ack && !sm_mem_grant;
     assign fr_log_err = fr_log_req && (!log_hit || log_perm_err);
     assign fr_log_rdata = dpram_ecat_rdata;
@@ -1196,7 +1197,7 @@ module ethercat_ipcore_top #(
     // ========================================================================
     // DPRAM Connections (via Sync Manager array)
     // ========================================================================
-    wire sm_mem_grant = sm_mem_req && !fr_log_req;
+    assign sm_mem_grant = sm_mem_req && !fr_log_req;
     assign dpram_ecat_req = sm_mem_grant | (fr_log_req && log_hit && !log_perm_err);
     assign dpram_ecat_wr = sm_mem_grant ? sm_mem_wr : fr_log_wr;
     assign dpram_ecat_addr = sm_mem_grant ? sm_mem_addr[12:0] : log_phy_addr[12:0];
@@ -1217,20 +1218,6 @@ module ethercat_ipcore_top #(
     // ========================================================================
     assign rx_error_counter = {rx_crc_error_count, rx_error_count};
 
-    // FMMU error latch (minimal)
-    always @(posedge ecat_clk or negedge ecat_rst_n_sync) begin
-        if (!ecat_rst_n_sync) begin
-            fmmu_err_latched <= 8'h00;
-        end else begin
-            if (fr_log_err) begin
-                if (!log_hit)
-                    fmmu_err_latched[0] <= 1'b1;
-                if (log_perm_err)
-                    fmmu_err_latched[4] <= 1'b1;
-            end
-        end
-    end
-    
     // Link loss counter - tracks link down events per port
     reg [15:0] link_loss_cnt_0;
     reg [15:0] link_loss_cnt_1;
@@ -1271,7 +1258,6 @@ module ethercat_ipcore_top #(
     assign sm_status = sm_active_bits[7:0];
     assign fmmu_status = fmmu_enable[7:0];
     assign sm_status_in = sm_status_packed;
-    assign fmmu_error_codes = { {(NUM_FMMU-1){8'h00}}, fmmu_err_latched };
     assign dl_status = dl_status_pc;
 
     // ========================================================================
@@ -1279,8 +1265,6 @@ module ethercat_ipcore_top #(
     // ========================================================================
     assign mbx_sm0_full = sm_status_packed[0*8 + 3];
     assign mbx_sm1_full_sm = sm_status_packed[1*8 + 3];
-    assign mbx_sm0_read = 1'b0; // TODO: drive via host/PDI when mailbox read completes
-
     always @(posedge ecat_clk or negedge ecat_rst_n_sync) begin
         if (!ecat_rst_n_sync) begin
             sm1_full_prev <= 1'b0;

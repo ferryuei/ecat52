@@ -173,7 +173,7 @@ module ecat_dc #(
     // Local Time Counter with Speed Adjustment
     // ========================================================================
     
-    always_ff @(posedge clk or negedge rst_n) begin
+    always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             local_time <= 64'h0;
             speed_accumulator <= 32'h0;
@@ -200,7 +200,7 @@ module ecat_dc #(
     // Port Receive Time Capture
     // ========================================================================
     
-    always_ff @(posedge clk or negedge rst_n) begin
+    always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             for (int i = 0; i < NUM_PORTS; i++) begin
                 port_recv_time[i] <= 64'h0;
@@ -222,7 +222,7 @@ module ecat_dc #(
     // SYNC0 Pulse Generation
     // ========================================================================
     
-    always_ff @(posedge clk or negedge rst_n) begin
+    always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             sync0_armed <= 1'b0;
             sync0_pulse <= 1'b0;
@@ -272,7 +272,7 @@ module ecat_dc #(
     // SYNC1 Pulse Generation
     // ========================================================================
     
-    always_ff @(posedge clk or negedge rst_n) begin
+    always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             sync1_armed <= 1'b0;
             sync1_pulse <= 1'b0;
@@ -336,7 +336,7 @@ module ecat_dc #(
     // Latch Input Synchronization and Edge Detection
     // ========================================================================
     
-    always_ff @(posedge clk or negedge rst_n) begin
+    always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             latch0_sync <= 3'b000;
             latch1_sync <= 3'b000;
@@ -362,7 +362,7 @@ module ecat_dc #(
     wire latch1_pos_edge = latch1_sync[2] && !latch1_prev;
     wire latch1_neg_edge = !latch1_sync[2] && latch1_prev;
     
-    always_ff @(posedge clk or negedge rst_n) begin
+    always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             latch0_pos_time <= 64'h0;
             latch0_neg_time <= 64'h0;
@@ -415,7 +415,7 @@ module ecat_dc #(
     // Register Read/Write Logic
     // ========================================================================
     
-    always_ff @(posedge clk or negedge rst_n) begin
+    always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             reg_rdata <= 16'h0000;
             reg_ack <= 1'b0;

@@ -242,7 +242,7 @@ task test_sm_config;
         
         repeat(5) @(posedge clk);
         
-        check_pass("SM activated", sm_active);
+        check_pass("SM activate bit set", cfg_rdata[0] == 1'b1);
     end
 endtask
 

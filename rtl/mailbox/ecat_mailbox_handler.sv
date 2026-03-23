@@ -280,7 +280,7 @@ module ecat_mailbox_handler #(
                         
                         if (coe_abort_code != 32'h0) begin
                             // SDO Abort response
-                            resp_length <= 16'h000A;  // 10 bytes
+                            resp_length <= 16'h0009;  // 9 bytes
                             response_buffer[0] <= 8'h80;  // Abort transfer
                             response_buffer[1] <= 8'h00;
                             response_buffer[2] <= coe_index[7:0];
@@ -292,7 +292,7 @@ module ecat_mailbox_handler #(
                             response_buffer[8] <= coe_abort_code[31:24];
                         end else begin
                             // SDO Response
-                            resp_length <= 16'h000A;  // 10 bytes
+                            resp_length <= 16'h0009;  // 9 bytes
                             response_buffer[0] <= coe_response_service;
                             response_buffer[1] <= 8'h00;
                             response_buffer[2] <= coe_index[7:0];
