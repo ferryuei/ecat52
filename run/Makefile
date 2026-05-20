@@ -78,6 +78,8 @@ RTL_SOURCES = \
 	$(RTL_DIR)/interface/ecat_sii_controller.sv \
 	$(RTL_DIR)/interface/ecat_mdio_master.sv \
 	$(RTL_DIR)/interface/ecat_pdi_avalon.sv \
+	$(RTL_DIR)/interface/ecat_pdi_spi.sv \
+	$(RTL_DIR)/interface/ecat_pdi_parallel.sv \
 	$(RTL_DIR)/interface/ecat_phy_interface.v \
 	$(RTL_DIR)/ethercat_ipcore_top.v
 
@@ -382,6 +384,8 @@ verilator-tb_ethercat_top: $(BUILD_DIR) $(WAVE_DIR)
 		$(ABS_RTL)/interface/ecat_sii_controller.sv \
 		$(ABS_RTL)/interface/ecat_mdio_master.sv \
 		$(ABS_RTL)/interface/ecat_pdi_avalon.sv \
+		$(ABS_RTL)/interface/ecat_pdi_spi.sv \
+		$(ABS_RTL)/interface/ecat_pdi_parallel.sv \
 		$(ABS_RTL)/interface/ecat_phy_interface.v \
 		$(ABS_RTL)/ethercat_ipcore_top.v \
 		$(ABS_TB_V)/tb_ethercat_top.v
@@ -539,6 +543,8 @@ VCS_RTL_tb_ethercat_top = \
 	$(VCS_ABS_RTL)/interface/ecat_sii_controller.sv \
 	$(VCS_ABS_RTL)/interface/ecat_mdio_master.sv \
 	$(VCS_ABS_RTL)/interface/ecat_pdi_avalon.sv \
+	$(VCS_ABS_RTL)/interface/ecat_pdi_spi.sv \
+	$(VCS_ABS_RTL)/interface/ecat_pdi_parallel.sv \
 	$(VCS_ABS_RTL)/interface/ecat_phy_interface.v \
 	$(VCS_ABS_RTL)/ethercat_ipcore_top.v
 

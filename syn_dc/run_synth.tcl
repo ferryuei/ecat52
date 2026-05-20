@@ -68,6 +68,8 @@ analyze -format sverilog -define USE_SRAM_MACRO [list \
     "$RTL_DIR/interface/ecat_sii_controller.sv" \
     "$RTL_DIR/interface/ecat_mdio_master.sv" \
     "$RTL_DIR/interface/ecat_pdi_avalon.sv" \
+    "$RTL_DIR/interface/ecat_pdi_spi.sv" \
+    "$RTL_DIR/interface/ecat_pdi_parallel.sv" \
     "$RTL_DIR/interface/ecat_phy_interface.v" \
     "$RTL_DIR/ethercat_ipcore_top.v" \
 ]

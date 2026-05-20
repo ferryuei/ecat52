@@ -92,6 +92,13 @@ module tb_ethercat_top;
     reg  [3:0]  pdi_byteenable;
     wire        pdi_waitrequest;
     wire        pdi_irq;
+
+    // SPI PDI (unused in Avalon mode)
+    wire        spi_miso;
+
+    // Parallel PDI (unused in Avalon mode)
+    wire [15:0] mcu_data;
+    wire        mcu_wait_n;
     
     // PHY Interface - Port 0
     wire        phy_tx_clk_0;
@@ -209,6 +216,21 @@ module tb_ethercat_top;
         .pdi_byteenable     (pdi_byteenable),
         .pdi_waitrequest    (pdi_waitrequest),
         .pdi_irq            (pdi_irq),
+
+        // SPI PDI (unused in Avalon mode)
+        .spi_sck            (1'b0),
+        .spi_cs_n           (1'b1),
+        .spi_mosi           (1'b0),
+        .spi_miso           (spi_miso),
+
+        // Parallel PDI (unused in Avalon mode)
+        .mcu_data           (mcu_data),
+        .mcu_addr           (16'h0000),
+        .mcu_cs_n           (1'b1),
+        .mcu_rd_n           (1'b1),
+        .mcu_wr_n           (1'b1),
+        .mcu_ale            (1'b0),
+        .mcu_wait_n         (mcu_wait_n),
         
         // PHY
         .phy_tx_clk         (phy_tx_clk),

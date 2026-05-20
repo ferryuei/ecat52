@@ -1,0 +1,159 @@
+================================================================================
+EtherCAT IP Core - MCU PDI 接口修改日志
+日期: 2026-05-20
+基线版本: 8004332 (main)
+================================================================================
+
+一、修改背景
+--------------------------------------------------------------------------------
+原 IP 核仅支持 Avalon-MM 32-bit 作为 PDI 接口，适合 FPGA SoC（如 Intel
+Nios II）场景。为使 IP 核能直接连接外部单片机（MCU），新增三种 MCU PDI
+接口：SPI、8-bit 并口、16-bit 并口，通过顶层参数 PDI_TYPE 在编译时选择。
+
+
+二、修改方案
+--------------------------------------------------------------------------------
+设计原则：所有 PDI 接口共享相同的内部接口（reg_req/ack -> 寄存器映射，
+sm_pdi_req/ack -> 同步管理器），仅外部总线协议不同。顶层通过 generate 块
+根据 PDI_TYPE 参数选择实例化对应模块，对内部逻辑完全透明。
+
+                         +---------------------------+
+  MCU SPI --------->     | ecat_pdi_spi.sv           |
+                         |                           |
+  MCU 8-bit bus ---->    | ecat_pdi_parallel #(8)    |---> reg_req/ack ---> Register Map
+                         |                           |---> sm_pdi_req/ack ---> Sync Manager
+  MCU 16-bit bus ---->   | ecat_pdi_parallel #(16)   |
+                         +---------------------------+
+
+PDI_TYPE 参数值："AVALON"（默认）, "SPI", "PARALLEL8", "PARALLEL16"
+
+
+三、文件清单
+--------------------------------------------------------------------------------
+
+[新增文件] 2个
+
+  文件                                        行数   说明
+  ------------------------------------------  -----  -----------------------------------
+  rtl/interface/ecat_pdi_spi.sv               448    SPI从机PDI接口，LAN9252协议兼容
+  rtl/interface/ecat_pdi_parallel.sv          378    参数化并行MCU总线PDI接口（8/16-bit）
+
+[修改文件] 4个
+
+  文件                                        改动      说明
+  ------------------------------------------  --------  -----------------------------------
+  rtl/ethercat_ipcore_top.v                   +213 -42  新增SPI/Parallel端口声明，PDI实例化
+                                                        改为generate块
+  tb_verilog/tb_ethercat_top.v                +22       测试台连接新增端口（SPI/Parallel
+                                                        接地，保持Avalon模式测试）
+  syn_dc/run_synth.tcl                        +2        综合脚本添加新RTL文件
+  run/Makefile                                +6        Verilator/VCS编译列表添加新RTL文件
+
+[额外修改] 非本次PDI相关，为先前提交的修改
+
+  syn_dc/Makefile          make clean增加*.mr/*.pvl/*.syn/lib_work/清理；
+                           中间文件重定向到tmpfiles/
+  run/vcs_regression.sh    tb_ethercat_top RTL文件列表添加新PDI模块
+
+
+四、各模块详细说明
+================================================================================
+
+4.1 ecat_pdi_spi.sv -- SPI从机接口
+--------------------------------------------------------------------------------
+
+[外部信号] 5 pin
+
+  信号        方向     说明
+  ----------  ------   --------------------------------------------------------
+  spi_sck     input    SPI时钟（异步于pdi_clk，最高40MHz）
+  spi_cs_n    input    片选（低有效，下降沿开始事务，上升沿终止）
+  spi_mosi    input    主出从入
+  spi_miso    output   主入从出
+  pdi_irq     output   中断请求
+
+[协议] LAN9252兼容
+
+  - SPI Mode 0/3, MSB first
+  - 命令格式: [CMD:8][ADDR_H:8][ADDR_L:8][DATA...]
+  - CMD 0x02 = Fast Read（含1 dummy byte）, 0x03 = Read, 0x04 = Write
+  - 数据字节序: LSB first（与LAN9252一致）
+  - 支持burst读写（地址自增）
+
+[关键技术点]
+
+  - spi_sck/spi_cs_n/spi_mosi经过3级同步器进入pdi_clk域
+  - 状态机: IDLE -> CMD -> ADDR_H -> ADDR_L -> [DUMMY] -> [WR_DATA/WAIT_ACK/RD_DATA]
+  - CS#上升沿立即复位状态机，保证中断恢复
+  - 8-bit SPI串并转换后映射为内部16-bit寄存器访问
+
+
+4.2 ecat_pdi_parallel.sv -- 并行MCU总线接口
+--------------------------------------------------------------------------------
+
+[外部信号]
+
+  信号        方向     宽度      说明
+  ----------  ------   ------    ------------------------------------------------
+  mcu_data    inout    8或16     双向数据总线（三态）
+  mcu_addr    input    16        地址总线
+  mcu_cs_n    input    1         片选（低有效）
+  mcu_rd_n    input    1         读选通（低有效）
+  mcu_wr_n    input    1         写选通（低有效）
+  mcu_ale     input    1         地址锁存使能（预留）
+  mcu_wait_n  output   1         等待信号（访问未完成时拉低）
+  pdi_irq     output   1         中断请求
+
+[参数] DATA_WIDTH = 8 或 16, ADDR_WIDTH = 16
+
+[访问时序]
+
+  读: CS#=0, ADDR有效, RD#↓ -> wait_n=0 -> 内部访问完成 -> data输出 -> wait_n=1 -> RD#↑
+  写: CS#=0, ADDR有效, DATA有效, WR#↓ -> wait_n=0 -> 采集数据 -> wait_n=1 -> WR#↑
+
+[关键技术点]
+
+  - mcu_rd_n/mcu_wr_n/mcu_cs_n经3级同步后做边沿检测
+  - 三态数据总线：读操作期间驱动mcu_data，其余时间高阻
+  - mcu_wait_n在内部ack返回前保持低电平，自动插入等待周期
+  - 8-bit模式下写数据零扩展至16-bit寄存器宽度
+  - 地址空间映射与Avalon一致：0x0000-0x0FFF寄存器，0x1000+ SM
+
+
+4.3 ethercat_ipcore_top.v 修改
+--------------------------------------------------------------------------------
+
+[端口声明] 新增SPI端口组（spi_sck/cs_n/mosi/miso）和Parallel端口组
+           （mcu_data/addr/cs_n/rd_n/wr_n/ale/wait_n）
+
+[PDI实例化改为generate块]
+
+  generate
+      if (PDI_TYPE == "AVALON")       begin : gen_pdi_avalon   ... end
+      else if (PDI_TYPE == "SPI")     begin : gen_pdi_spi      ... end
+      else if (PDI_TYPE == "PARALLEL8")  begin : gen_pdi_par8   ... end
+      else if (PDI_TYPE == "PARALLEL16") begin : gen_pdi_par16  ... end
+  endgenerate
+
+  未选中的PDI类型对应的端口在综合时被优化掉，不影响面积和时序。
+
+
+五、验证结果
+--------------------------------------------------------------------------------
+
+VCS全量回归 21/21 PASSED（0失败）
+
+  测试                                        用例数   结果
+  ------------------------------------------  ------   ------
+  tb_dpram                                    13       PASSED
+  tb_register_map                             31       PASSED
+  tb_al_statemachine                          17       PASSED
+  tb_fmmu / tb_sync_manager / tb_dc / ...     各自通过  PASSED
+  tb_pdi（Avalon PDI）                        8        PASSED
+  tb_ethercat_top（集成测试）                  15       PASSED
+
+确认修改不影响现有功能。
+
+================================================================================
+EOF
+================================================================================
