@@ -20,7 +20,7 @@
 // ============================================================================
 // Function: Logarithm base 2 (ceiling)
 // ============================================================================
-function integer log2;
+function automatic integer log2;
     input integer value;
     integer temp;
     begin
@@ -33,7 +33,7 @@ endfunction
 // ============================================================================
 // Function: Calculate logarithm to base 2 (used for address width)
 // ============================================================================
-function integer log_to_base2;
+function automatic integer log_to_base2;
     input integer value;
     integer result;
     begin
@@ -48,7 +48,7 @@ endfunction
 // ============================================================================
 // Function: Selection multiplexer (similar to VHDL select function)
 // ============================================================================
-function integer sel_func_int;
+function automatic integer sel_func_int;
     input sel;
     input integer a;
     input integer b;
@@ -60,7 +60,7 @@ endfunction
 // ============================================================================
 // Function: Minimum of integers
 // ============================================================================
-function integer min2;
+function automatic integer min2;
     input integer a;
     input integer b;
     begin
@@ -68,7 +68,7 @@ function integer min2;
     end
 endfunction
 
-function integer min3;
+function automatic integer min3;
     input integer a;
     input integer b;
     input integer c;
@@ -80,7 +80,7 @@ endfunction
 // ============================================================================
 // Function: Maximum of integers
 // ============================================================================
-function integer max2;
+function automatic integer max2;
     input integer a;
     input integer b;
     begin
@@ -88,7 +88,7 @@ function integer max2;
     end
 endfunction
 
-function integer max3;
+function automatic integer max3;
     input integer a;
     input integer b;
     input integer c;
@@ -100,7 +100,7 @@ endfunction
 // ============================================================================
 // Function: Clamp value between min and max
 // ============================================================================
-function integer clamp;
+function automatic integer clamp;
     input integer value;
     input integer min_val;
     input integer max_val;

@@ -458,15 +458,110 @@ iverilog-run: iverilog-all
 	@echo "=========================================="
 
 # ============================================================================
+# VCS Configuration
+# ============================================================================
+
+VCS = vcs
+export VCS_ARCH_OVERRIDE = linux
+export VCS_TARGET_ARCH = amd64
+VCS_COMMON = +v2k -sverilog -debug_access+all +vcs+loopreport
+VCS_COMMON += +incdir+$(VCS_ABS_RTL) +incdir+$(VCS_ABS_LIB)
+VCS_COMMON += +incdir+$(VCS_ABS_RTL)/frame +incdir+$(VCS_ABS_RTL)/data +incdir+$(VCS_ABS_RTL)/control
+VCS_COMMON += +incdir+$(VCS_ABS_RTL)/dc +incdir+$(VCS_ABS_RTL)/interface +incdir+$(VCS_ABS_RTL)/mailbox
+VCS_COMMON += -timescale=1ns/1ps -notice -line +warn=noLCA_FEATURES
+VCS_COV = +cover=bcesfx
+
+VCS_BUILD = $(BUILD_DIR)/vcs
+
+# Absolute paths for VCS (cd into build/vcs/tb_xxx breaks relative paths)
+VCS_ABS_RTL  = $(shell cd $(RTL_DIR) && pwd)
+VCS_ABS_LIB  = $(shell cd $(LIB_DIR) && pwd)
+VCS_ABS_TB_V = $(shell cd $(TB_V_DIR) && pwd)
+
+# VCS test list
+VCS_TESTS = \
+	tb_dpram tb_register_map tb_al_statemachine tb_fmmu \
+	tb_sync_manager tb_dc tb_frame_receiver tb_frame_transmitter \
+	tb_sii_eeprom tb_coe_handler tb_coe_enhanced \
+	tb_foe_handler tb_eoe_handler tb_soe_handler tb_voe_handler \
+	tb_mailbox_handler tb_pdi tb_mii tb_port_controller tb_sm \
+	tb_ethercat_top
+
+# ============================================================================
 # VCS Testbench Targets
 # ============================================================================
 
-.PHONY: check-vcs vcs-run vcs-run-nocov vcs-run-tests
+.PHONY: check-vcs vcs-all vcs-run vcs-run-nocov vcs-run-tests vcs-clean
 
 check-vcs:
-	@which vcs > /dev/null 2>&1 || (echo "Error: vcs not found in PATH" && exit 1)
-	@which urg > /dev/null 2>&1 || (echo "Error: urg not found in PATH" && exit 1)
+	@which $(VCS) > /dev/null 2>&1 || (echo "Error: vcs not found in PATH" && exit 1)
 
+vcs-all: check-vcs $(addprefix vcs-,$(VCS_TESTS))
+
+# --- VCS RTL file mapping per test ---
+VCS_RTL_tb_dpram = $(VCS_ABS_LIB)/ecat_dpram.sv
+VCS_RTL_tb_register_map = $(VCS_ABS_RTL)/data/ecat_register_map.sv
+VCS_RTL_tb_al_statemachine = $(VCS_ABS_RTL)/control/ecat_al_statemachine.sv
+VCS_RTL_tb_fmmu = $(VCS_ABS_RTL)/data/ecat_fmmu.sv
+VCS_RTL_tb_sync_manager = $(VCS_ABS_LIB)/ecat_dpram.sv $(VCS_ABS_RTL)/data/ecat_sync_manager.sv
+VCS_RTL_tb_dc = $(VCS_ABS_RTL)/dc/ecat_dc.sv
+VCS_RTL_tb_frame_receiver = $(VCS_ABS_RTL)/frame/ecat_frame_receiver.sv
+VCS_RTL_tb_frame_transmitter = $(VCS_ABS_RTL)/frame/ecat_frame_transmitter.sv
+VCS_RTL_tb_sii_eeprom = $(VCS_ABS_RTL)/interface/ecat_sii_controller.sv
+VCS_RTL_tb_coe_handler = $(VCS_ABS_RTL)/mailbox/ecat_coe_handler.sv
+VCS_RTL_tb_coe_enhanced = $(VCS_ABS_RTL)/mailbox/ecat_coe_handler.sv
+VCS_RTL_tb_foe_handler = $(VCS_ABS_RTL)/mailbox/ecat_foe_handler.sv
+VCS_RTL_tb_eoe_handler = $(VCS_ABS_RTL)/mailbox/ecat_eoe_handler.sv
+VCS_RTL_tb_soe_handler = $(VCS_ABS_RTL)/mailbox/ecat_soe_handler.sv
+VCS_RTL_tb_voe_handler = $(VCS_ABS_RTL)/mailbox/ecat_voe_handler.sv
+VCS_RTL_tb_mailbox_handler = $(VCS_ABS_RTL)/mailbox/ecat_mailbox_handler.sv
+VCS_RTL_tb_pdi = $(VCS_ABS_RTL)/interface/ecat_pdi_avalon.sv
+VCS_RTL_tb_mii = $(VCS_ABS_RTL)/interface/ecat_phy_interface.v
+VCS_RTL_tb_port_controller = $(VCS_ABS_RTL)/frame/ecat_port_controller.sv
+VCS_RTL_tb_sm = $(VCS_ABS_LIB)/ecat_dpram.sv $(VCS_ABS_RTL)/data/ecat_sync_manager.sv
+VCS_RTL_tb_ethercat_top = \
+	$(VCS_ABS_LIB)/ddr_stages.v $(VCS_ABS_LIB)/synchronizer.v $(VCS_ABS_LIB)/async_fifo.v \
+	$(VCS_ABS_LIB)/ecat_dpram.sv \
+	$(VCS_ABS_RTL)/frame/ecat_frame_receiver.sv \
+	$(VCS_ABS_RTL)/frame/ecat_frame_transmitter.sv \
+	$(VCS_ABS_RTL)/frame/ecat_port_controller.sv \
+	$(VCS_ABS_RTL)/data/ecat_fmmu.sv \
+	$(VCS_ABS_RTL)/data/ecat_sync_manager.sv \
+	$(VCS_ABS_RTL)/data/ecat_register_map.sv \
+	$(VCS_ABS_RTL)/mailbox/ecat_mailbox_handler.sv \
+	$(VCS_ABS_RTL)/mailbox/ecat_coe_handler.sv \
+	$(VCS_ABS_RTL)/mailbox/ecat_foe_handler.sv \
+	$(VCS_ABS_RTL)/mailbox/ecat_eoe_handler.sv \
+	$(VCS_ABS_RTL)/mailbox/ecat_soe_handler.sv \
+	$(VCS_ABS_RTL)/mailbox/ecat_voe_handler.sv \
+	$(VCS_ABS_RTL)/control/ecat_al_statemachine.sv \
+	$(VCS_ABS_RTL)/dc/ecat_dc.sv \
+	$(VCS_ABS_RTL)/interface/ecat_sii_controller.sv \
+	$(VCS_ABS_RTL)/interface/ecat_mdio_master.sv \
+	$(VCS_ABS_RTL)/interface/ecat_pdi_avalon.sv \
+	$(VCS_ABS_RTL)/interface/ecat_phy_interface.v \
+	$(VCS_ABS_RTL)/ethercat_ipcore_top.v
+
+# Generic VCS compile rule using eval/call
+define VCS_TEST_RULE
+vcs-$(1): check-vcs
+	@mkdir -p $(VCS_BUILD)/$(1) $(WAVE_DIR)
+	@echo "=== Compiling $(1) (VCS) ==="
+	cd $(VCS_BUILD)/$(1) && $(VCS) $(VCS_COMMON) $(VCS_COV) \
+		-cm_dir $(VCS_BUILD)/vcs_cov/$(1).vdb \
+		-top $(1) \
+		$(VCS_ABS_LIB)/ecat_pkg.vh $(VCS_ABS_LIB)/ecat_core_defines.vh \
+		$(VCS_RTL_$(1)) \
+		$(VCS_ABS_TB_V)/$(1).v \
+		-o simv -Mdir=csrc -l compile.log
+	@echo "Build complete: $(VCS_BUILD)/$(1)/simv"
+endef
+
+$(foreach test,$(VCS_TESTS),$(eval $(call VCS_TEST_RULE,$(test))))
+
+# --- VCS run targets ---
+
+# Run all VCS tests with coverage (via regression script)
 vcs-run: check-vcs
 	@echo "=========================================="
 	@echo "Running VCS Regression (with coverage)"
@@ -486,6 +581,18 @@ vcs-run-tests: check-vcs
 	fi
 	@echo "Running selected VCS tests: $(TESTS)"
 	@./vcs_regression.sh --tests $(TESTS)
+
+# Run individual VCS test (compile + run)
+run-vcs-%: vcs-%
+	@echo "Running VCS test: $*..."
+	@cd $(VCS_BUILD)/$* && ./simv +vcs+lic+wait -l sim.log \
+		+cover=bcesfx -cm_dir $(VCS_BUILD)/vcs_cov/$*.vdb -cm line+cond+fsm+tgl+branch+assert
+	@mv -f *.vcd *.vpd $(WAVE_DIR)/ 2>/dev/null || true
+	@echo "$*: done"
+
+vcs-clean:
+	@echo "Cleaning VCS build files..."
+	@rm -rf $(VCS_BUILD)
 
 # ============================================================================
 # Yosys Synthesis Targets
@@ -637,9 +744,13 @@ help:
 	@echo "  make iverilog-run        - Build and run iverilog tests"
 	@echo ""
 	@echo "VCS Targets:"
+	@echo "  make vcs-all             - Compile all VCS tests"
 	@echo "  make vcs-run             - Run full VCS regression with coverage"
 	@echo "  make vcs-run-nocov       - Run full VCS regression without coverage"
 	@echo "  make vcs-run-tests TESTS=tb_a,tb_b - Run selected VCS tests"
+	@echo "  make vcs-<test>          - Compile specific VCS test"
+	@echo "  make run-vcs-<test>      - Compile and run specific VCS test"
+	@echo "  make vcs-clean           - Clean VCS build files"
 	@echo ""
 	@echo "Yosys Synthesis Targets:"
 	@echo "  make synth               - Generic FPGA synthesis"
