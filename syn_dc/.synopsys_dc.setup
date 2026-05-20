@@ -1,0 +1,50 @@
+# ============================================================================
+# Synopsys DC Setup - TSMC 28nm HPC+ BWP40P140 HVT
+# ============================================================================
+
+# ============================================================================
+# Library Paths
+# ============================================================================
+set TSMCHOME "/home/fang/Downloads/tcbn28hpcplusbwp40p140hvt_180a/AN61001_20180829/TSMCHOME/digital"
+
+# Target library (NLDM .db for DC synthesis)
+set TARGET_LIBRARY "$TSMCHOME/Front_End/timing_power_noise/NLDM/tcbn28hpcplusbwp40p140hvt_180a/tcbn28hpcplusbwp40p140hvttt1v25c.db"
+
+# Link library (SRAM treated as black box during synthesis)
+set LINK_LIBRARY [concat "*" $TARGET_LIBRARY "dw_foundation.sldb"]
+
+# Synthetic library
+set SYNTHETIC_LIBRARY "dw_foundation.sldb"
+
+# ============================================================================
+# Library Loading
+# ============================================================================
+set target_library $TARGET_LIBRARY
+set link_library $LINK_LIBRARY
+set synthetic_library $SYNTHETIC_LIBRARY
+
+# ============================================================================
+# Search Path
+# ============================================================================
+set search_path [list "." "./work" \
+    "../rtl" "../lib" \
+    "../rtl/frame" "../rtl/data" "../rtl/control" \
+    "../rtl/dc" "../rtl/interface" "../rtl/mailbox" \
+    "/eda_new/synopsys_2019/dc/Q-2019.12-SP5/libraries/syn" \
+    "/eda_new/synopsys_2019/dc/Q-2019.12-SP5/dw/sim_ver" \
+]
+
+# ============================================================================
+# HDL Settings
+# ============================================================================
+
+# Enable SystemVerilog processing for all files
+set hdlin_enable_all_sv_mode true
+set svr_is_sv_default true
+
+# Suppress common warnings
+suppress_message {VER-314 VER-936}
+suppress_message {ELAB-311 ELAB-349}
+suppress_message {TIM-052 TIM-111}
+suppress_message {OPT-1006 OPT-1067}
+
