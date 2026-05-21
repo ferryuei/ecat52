@@ -918,6 +918,15 @@ module ethercat_ipcore_top #(
     // ========================================================================
     // PDI Interface - Selected by PDI_TYPE parameter
     // ========================================================================
+    // Internal wires for each PDI type's external outputs
+    wire [PDI_DATA_WIDTH-1:0] avalon_readdata;
+    wire                      avalon_readdatavalid;
+    wire                      avalon_waitrequest;
+    wire                      spi_miso_r;
+    wire [15:0]               par_mcu_data;
+    wire                      par_mcu_wait_n;
+    wire                      pdi_irq_r;       // unified PDI IRQ from active module
+
     generate
         if (PDI_TYPE == "AVALON") begin : gen_pdi_avalon
             ecat_pdi_avalon #(
@@ -926,16 +935,14 @@ module ethercat_ipcore_top #(
             ) pdi_inst (
                 .rst_n              (sys_rst_n_sync),
                 .clk                (pdi_clk),
-                // Avalon interface
                 .avs_address        (pdi_address),
                 .avs_read           (pdi_read),
-                .avs_readdata       (pdi_readdata),
-                .avs_readdatavalid  (pdi_readdatavalid),
+                .avs_readdata       (avalon_readdata),
+                .avs_readdatavalid  (avalon_readdatavalid),
                 .avs_write          (pdi_write),
                 .avs_writedata      (pdi_writedata),
                 .avs_byteenable     (pdi_byteenable),
-                .avs_waitrequest    (pdi_waitrequest),
-                // Register access
+                .avs_waitrequest    (avalon_waitrequest),
                 .reg_req            (pdi_reg_req),
                 .reg_wr             (pdi_reg_wr),
                 .reg_addr           (pdi_reg_addr),
@@ -943,7 +950,6 @@ module ethercat_ipcore_top #(
                 .reg_be             (pdi_reg_be),
                 .reg_rdata          (pdi_reg_rdata),
                 .reg_ack            (pdi_reg_ack),
-                // SM access
                 .sm_id              (pdi_sm_id),
                 .sm_pdi_req         (pdi_sm_req),
                 .sm_pdi_wr          (pdi_sm_wr),
@@ -951,12 +957,10 @@ module ethercat_ipcore_top #(
                 .sm_pdi_wdata       (pdi_sm_wdata),
                 .sm_pdi_rdata       (pdi_sm_rdata),
                 .sm_pdi_ack         (pdi_sm_ack),
-                // Control
                 .pdi_enable         (pdi_enable),
                 .pdi_operational    (pdi_operational),
                 .pdi_watchdog_timeout(pdi_watchdog_timeout),
-                // IRQ
-                .pdi_irq            (pdi_irq),
+                .pdi_irq            (pdi_irq_r),
                 .irq_sources        (irq_request)
             );
         end
@@ -964,12 +968,10 @@ module ethercat_ipcore_top #(
             ecat_pdi_spi pdi_inst (
                 .rst_n              (sys_rst_n_sync),
                 .clk                (pdi_clk),
-                // SPI interface
                 .spi_sck            (spi_sck),
                 .spi_cs_n           (spi_cs_n),
                 .spi_mosi           (spi_mosi),
-                .spi_miso           (spi_miso),
-                // Register access
+                .spi_miso           (spi_miso_r),
                 .reg_req            (pdi_reg_req),
                 .reg_wr             (pdi_reg_wr),
                 .reg_addr           (pdi_reg_addr),
@@ -977,7 +979,6 @@ module ethercat_ipcore_top #(
                 .reg_be             (pdi_reg_be),
                 .reg_rdata          (pdi_reg_rdata),
                 .reg_ack            (pdi_reg_ack),
-                // SM access
                 .sm_id              (pdi_sm_id),
                 .sm_pdi_req         (pdi_sm_req),
                 .sm_pdi_wr          (pdi_sm_wr),
@@ -985,12 +986,10 @@ module ethercat_ipcore_top #(
                 .sm_pdi_wdata       (pdi_sm_wdata),
                 .sm_pdi_rdata       (pdi_sm_rdata),
                 .sm_pdi_ack         (pdi_sm_ack),
-                // Control
                 .pdi_enable         (pdi_enable),
                 .pdi_operational    (pdi_operational),
                 .pdi_watchdog_timeout(pdi_watchdog_timeout),
-                // IRQ
-                .pdi_irq            (pdi_irq),
+                .pdi_irq            (pdi_irq_r),
                 .irq_sources        (irq_request)
             );
         end
@@ -1001,16 +1000,14 @@ module ethercat_ipcore_top #(
             ) pdi_inst (
                 .rst_n              (sys_rst_n_sync),
                 .clk                (pdi_clk),
-                // Parallel interface
-                .mcu_data           (mcu_data[7:0]),
+                .mcu_data           (par_mcu_data[7:0]),
                 .mcu_addr           (mcu_addr),
                 .mcu_cs_n           (mcu_cs_n),
                 .mcu_rd_n           (mcu_rd_n),
                 .mcu_wr_n           (mcu_wr_n),
                 .mcu_ale            (mcu_ale),
-                .mcu_wait_n         (mcu_wait_n),
-                .mcu_irq            (pdi_irq),
-                // Register access
+                .mcu_wait_n         (par_mcu_wait_n),
+                .mcu_irq            (pdi_irq_r),
                 .reg_req            (pdi_reg_req),
                 .reg_wr             (pdi_reg_wr),
                 .reg_addr           (pdi_reg_addr),
@@ -1018,7 +1015,6 @@ module ethercat_ipcore_top #(
                 .reg_be             (pdi_reg_be),
                 .reg_rdata          (pdi_reg_rdata),
                 .reg_ack            (pdi_reg_ack),
-                // SM access
                 .sm_id              (pdi_sm_id),
                 .sm_pdi_req         (pdi_sm_req),
                 .sm_pdi_wr          (pdi_sm_wr),
@@ -1026,11 +1022,9 @@ module ethercat_ipcore_top #(
                 .sm_pdi_wdata       (pdi_sm_wdata),
                 .sm_pdi_rdata       (pdi_sm_rdata),
                 .sm_pdi_ack         (pdi_sm_ack),
-                // Control
                 .pdi_enable         (pdi_enable),
                 .pdi_operational    (pdi_operational),
                 .pdi_watchdog_timeout(pdi_watchdog_timeout),
-                // IRQ
                 .irq_sources        (irq_request)
             );
         end
@@ -1041,16 +1035,14 @@ module ethercat_ipcore_top #(
             ) pdi_inst (
                 .rst_n              (sys_rst_n_sync),
                 .clk                (pdi_clk),
-                // Parallel interface
-                .mcu_data           (mcu_data),
+                .mcu_data           (par_mcu_data),
                 .mcu_addr           (mcu_addr),
                 .mcu_cs_n           (mcu_cs_n),
                 .mcu_rd_n           (mcu_rd_n),
                 .mcu_wr_n           (mcu_wr_n),
                 .mcu_ale            (mcu_ale),
-                .mcu_wait_n         (mcu_wait_n),
-                .mcu_irq            (pdi_irq),
-                // Register access
+                .mcu_wait_n         (par_mcu_wait_n),
+                .mcu_irq            (pdi_irq_r),
                 .reg_req            (pdi_reg_req),
                 .reg_wr             (pdi_reg_wr),
                 .reg_addr           (pdi_reg_addr),
@@ -1058,7 +1050,6 @@ module ethercat_ipcore_top #(
                 .reg_be             (pdi_reg_be),
                 .reg_rdata          (pdi_reg_rdata),
                 .reg_ack            (pdi_reg_ack),
-                // SM access
                 .sm_id              (pdi_sm_id),
                 .sm_pdi_req         (pdi_sm_req),
                 .sm_pdi_wr          (pdi_sm_wr),
@@ -1066,15 +1057,37 @@ module ethercat_ipcore_top #(
                 .sm_pdi_wdata       (pdi_sm_wdata),
                 .sm_pdi_rdata       (pdi_sm_rdata),
                 .sm_pdi_ack         (pdi_sm_ack),
-                // Control
                 .pdi_enable         (pdi_enable),
                 .pdi_operational    (pdi_operational),
                 .pdi_watchdog_timeout(pdi_watchdog_timeout),
-                // IRQ
                 .irq_sources        (irq_request)
             );
         end
     endgenerate
+
+    // ========================================================================
+    // PDI Output Mux - drive top-level outputs from active PDI type
+    //                   unused PDI outputs tied to safe default values
+    // ========================================================================
+
+    // Avalon outputs
+    assign pdi_readdata      = (PDI_TYPE == "AVALON") ? avalon_readdata       : {PDI_DATA_WIDTH{1'b0}};
+    assign pdi_readdatavalid = (PDI_TYPE == "AVALON") ? avalon_readdatavalid  : 1'b0;
+    assign pdi_waitrequest   = (PDI_TYPE == "AVALON") ? avalon_waitrequest    : 1'b0;
+
+    // SPI outputs
+    assign spi_miso          = (PDI_TYPE == "SPI")    ? spi_miso_r            : 1'b0;
+
+    // Parallel outputs (PARALLEL8 or PARALLEL16)
+    assign mcu_wait_n        = (PDI_TYPE == "PARALLEL8" || PDI_TYPE == "PARALLEL16") ? par_mcu_wait_n : 1'b1;
+    assign mcu_data          = (PDI_TYPE == "PARALLEL8" || PDI_TYPE == "PARALLEL16") ? par_mcu_data   : {16{1'bz}};
+
+    // PDI IRQ - driven by active module via pdi_irq_r, default 0
+    // Only one generate branch drives pdi_irq_r; for unused types it stays 'z',
+    // so OR with 1'b0 forces a clean default.
+    wire pdi_irq_int = (PDI_TYPE == "AVALON" || PDI_TYPE == "SPI" ||
+                        PDI_TYPE == "PARALLEL8" || PDI_TYPE == "PARALLEL16") ? pdi_irq_r : 1'b0;
+    assign pdi_irq = pdi_irq_int;
 
     // ========================================================================
     // Mailbox Handler and CoE
